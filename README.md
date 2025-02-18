@@ -5,7 +5,7 @@ ___
 ### Download
 [Releases](https://github.com/raphael12333/iw1x-server/releases)
 ___
-### Installation and usage
+### Usage and Build steps
 See the [Wiki](https://github.com/raphael12333/iw1x-server/wiki)
 ___
 #### References
