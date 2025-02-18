@@ -6,7 +6,7 @@ ___
 [Releases](https://github.com/raphael12333/iw1x-server/releases)
 ___
 ### Usage and Build steps
-See the [Wiki](https://github.com/raphael12333/iw1x-server/wiki)
+[Wiki](https://github.com/raphael12333/iw1x-server/wiki)
 ___
 #### References
 - [Killtube](https://www.killtube.org/)
