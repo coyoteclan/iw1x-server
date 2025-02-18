@@ -2,6 +2,9 @@
 ### Adding security, fixes, and features
 Supported game version: **1.1**
 ___
+### Download
+[Releases](https://github.com/raphael12333/iw1x-server/releases)
+___
 ### Installation and usage
 See the [Wiki](https://github.com/raphael12333/iw1x-server/wiki)
 ___
