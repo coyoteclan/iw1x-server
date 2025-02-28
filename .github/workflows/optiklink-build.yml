@@ -1,10 +1,49 @@
 name: Optiklink Build
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debugging information, disable optimization'
+        required: true
+        default: 'ON'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      unsafe:
+        description: 'Enable unsafe features (fread, fwrite...)'
+        required: true
+        default: 'ON'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      sqlite:
+        description: 'SQLite support'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      curl:
+        description: 'cURL support'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      ssl:
+        description: 'SSL support (hash)'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+
 
 jobs:
   build:
@@ -28,33 +67,24 @@ jobs:
           # Optional build dependencies (install if you need SQLite, cURL, or SSL support)
           apt-get install -y libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
 
-      - name: Configure Debug Build
+      - name: Configure Build
         run: |
           mkdir -p build
           cd build
-          cmake .. -DDEBUG_BUILD=ON -DENABLE_UNSAFE=ON
+          cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DENABLE_SQLITE=$BSQLITE -DENABLE_CURL=$BCURL -DENABLE_SSL=$BSSL
+        env:
+          BDEBUG: ${{ inputs.debug }}
+          BUNSAFE: ${{ inputs.unsafe }}
+          BSQLITE: ${{ inputs.sqlite }}
+          BCURL: ${{ inputs.curl }}
+          BSSL: ${{ inputs.ssl }}
 
-      - name: Build Debug
+      - name: Build
         run: |
           cd build
           make
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iw1x library (debug, unsafe) for Optiklink servers
-          path: bin/iw1x.so
-      
-      - name: Configure Release Build
-        run: |
-          rm -rf build/*
-          cd build
-          cmake .. -DDEBUG_BUILD=OFF -DENABLE_UNSAFE=ON
-      - name: Build Release
-        run: |
-          cd build
-          make
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: iw1x library (release, unsafe) for Optiklink servers
+          name: iw1x library for Optiklink servers
           path: bin/iw1x.so

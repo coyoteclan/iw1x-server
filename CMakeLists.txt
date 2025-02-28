@@ -22,6 +22,12 @@ option(COMPILE_SQLITE "SQLite support" OFF)
 option(COMPILE_CURL "cURL support" OFF)
 option(COMPILE_SSL "SSL support (hash)" OFF)
 
+message(STATUS "Debug build: ${DEBUG_BUILD}")
+message(STATUS "Unsafe features: ${ENABLE_UNSAFE}")
+message(STATUS "SQLite support: ${COMPILE_SQLITE}")
+message(STATUS "cURL support: ${COMPILE_CURL}")
+message(STATUS "SSL support: ${COMPILE_SSL}")
+
 if(DEBUG_BUILD)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -ggdb -O0")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb -O0")
