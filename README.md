@@ -1,9 +1,13 @@
-# Modifications for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game)) Linux server
+###### top-link
+# Improvements for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game)) Linux server
 ### Adding security, fixes, and features
 Supported game version: **1.1**
 ___
-### Installation and usage
-See the [Wiki](https://github.com/raphael12333/iw1x-server/wiki)
+### Download
+[Releases](https://github.com/raphael12333/iw1x-server/releases)
+___
+### Usage and Build steps
+[Wiki](https://github.com/raphael12333/iw1x-server/wiki)
 ___
 #### References
 - [Killtube](https://www.killtube.org/)
