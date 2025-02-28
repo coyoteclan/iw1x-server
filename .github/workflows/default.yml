@@ -32,16 +32,27 @@ jobs:
           cd build
           cmake .. -DDEBUG_BUILD=ON -DENABLE_UNSAFE=ON
 
-      - name: Build
+      - name: Build Debug
         run: |
           cd build
           make
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iw1x library
+          name: iw1x library (debug, unsafe)
           path: bin/iw1x.so
       
       - name: Configure Release Build
         run: |
-          ls
+          rm -rf build/*
+          cd build
+          cmake .. -DDEBUG_BUILD=OFF -DENABLE_UNSAFE=ON
+      - name: Build Release
+        run: |
+          cd build
+          make
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iw1x library (release, unsafe)
+          path: bin/iw1x.so

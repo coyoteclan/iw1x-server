@@ -9,8 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    container:
+    container: 
       image: debian:buster
 
     steps:
@@ -29,19 +28,33 @@ jobs:
           # Optional build dependencies (install if you need SQLite, cURL, or SSL support)
           apt-get install -y libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
 
-      - name: Configure Build
+      - name: Configure Debug Build
         run: |
           mkdir -p build
           cd build
           cmake .. -DDEBUG_BUILD=ON -DENABLE_UNSAFE=ON
 
-      - name: Build
+      - name: Build Debug
         run: |
           cd build
           make
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iw1x library for Optiklink servers
+          name: iw1x library (debug, unsafe) for Optiklink servers
+          path: bin/iw1x.so
+      
+      - name: Configure Release Build
+        run: |
+          rm -rf build/*
+          cd build
+          cmake .. -DDEBUG_BUILD=OFF -DENABLE_UNSAFE=ON
+      - name: Build Release
+        run: |
+          cd build
+          make
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iw1x library (release, unsafe) for Optiklink servers
           path: bin/iw1x.so
