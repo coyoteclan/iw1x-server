@@ -50,6 +50,13 @@ jobs:
     runs-on: ubuntu-latest
     container: 
       image: debian:buster
+    
+    env:
+      BDEBUG: ${{ inputs.debug || 'OFF' }}
+      BUNSAFE: ${{ inputs.unsafe || 'ON' }}
+      BSQLITE: ${{ inputs.sqlite || 'OFF' }}
+      BCURL: ${{ inputs.curl || 'OFF' }}
+      BSSL: ${{ inputs.ssl || 'OFF' }}
 
     steps:
       - name: Checkout Repository
@@ -62,22 +69,13 @@ jobs:
           apt-get update
 
           # Required for building
-          apt-get install -y g++-multilib cmake
-
-          # Optional build dependencies (install if you need SQLite, cURL, or SSL support)
-          apt-get install -y libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
+          apt-get install -y g++-multilib cmake libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
 
       - name: Configure Build
         run: |
           mkdir -p build
           cd build
           cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL
-        env:
-          BDEBUG: ${{ inputs.debug }}
-          BUNSAFE: ${{ inputs.unsafe }}
-          BSQLITE: ${{ inputs.sqlite }}
-          BCURL: ${{ inputs.curl }}
-          BSSL: ${{ inputs.ssl }}
 
       - name: Build
         run: |
