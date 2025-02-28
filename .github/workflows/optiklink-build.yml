@@ -71,7 +71,7 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DENABLE_SQLITE=$BSQLITE -DENABLE_CURL=$BCURL -DENABLE_SSL=$BSSL
+          cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL
         env:
           BDEBUG: ${{ inputs.debug }}
           BUNSAFE: ${{ inputs.unsafe }}
