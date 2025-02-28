@@ -43,5 +43,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iw1x library for Optiklink
+          name: iw1x library for Optiklink servers
           path: bin/iw1x.so
