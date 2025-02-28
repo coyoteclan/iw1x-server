@@ -6,7 +6,7 @@ on:
       debug:
         description: 'Enable debugging information, disable optimization'
         required: true
-        default: 'ON'
+        default: 'OFF'
         type: choice
         options:
         - 'ON'
