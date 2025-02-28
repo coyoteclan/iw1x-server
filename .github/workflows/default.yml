@@ -87,5 +87,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iw1x library (debug, unsafe)
+          name: iw1x library
           path: bin/iw1x.so
