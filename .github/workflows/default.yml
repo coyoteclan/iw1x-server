@@ -1,0 +1,43 @@
+name: Default Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          # Add i386 architecture so that 32-bit packages can be installed
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+
+          # Required for building
+          sudo apt-get install -y g++-multilib cmake
+
+          # Optional build dependencies (install if you need SQLite, cURL, or SSL support)
+          sudo apt-get install -y libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
+
+      - name: Configure Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DDEBUG_BUILD=ON -DENABLE_UNSAFE=ON
+
+      - name: Build
+        run: |
+          cd build
+          make
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iw1x library
+          path: bin/iw1x.so

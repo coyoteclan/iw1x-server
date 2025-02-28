@@ -1,4 +1,4 @@
-name: Build Project
+name: Optiklink Build
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: debian-buster
 
     steps:
       - name: Checkout Repository
@@ -39,5 +39,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iw1x library
+          name: iw1x library for Optiklink
           path: bin/iw1x.so
