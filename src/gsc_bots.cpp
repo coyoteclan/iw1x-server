@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 
 void gsc_bots_setbotstance(scr_entref_t ref)
 {

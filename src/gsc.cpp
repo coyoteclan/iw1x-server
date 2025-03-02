@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 
 const char * getParamTypeAsString(int type)
 {

@@ -21,7 +21,7 @@ asm volatile (
 );
 */
 
-#include "shared.hpp"
+#include "shared.h"
 
 // Custom cvars
 extern cvar_t *jump_height;

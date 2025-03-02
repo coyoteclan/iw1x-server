@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 
 extern cvar_t *player_sprintTime;
 

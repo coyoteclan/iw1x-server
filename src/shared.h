@@ -1,5 +1,5 @@
-#ifndef _SHARED_HPP_
-#define _SHARED_HPP_
+#ifndef SHARED_H
+#define SHARED_H
 
 #include <unistd.h>     // access
 #include <stdint.h>     // uint16_t
@@ -9,10 +9,10 @@
 #include <stdarg.h>     // va
 #include <string>
 
-#include "types.hpp"
-#include "functions.hpp"
+#include "types.h"
+#include "functions.h"
 
-#include "gsc.hpp"
+#include "gsc.h"
 
 #define STACK_UNDEFINED 0
 #define STACK_STRING 1

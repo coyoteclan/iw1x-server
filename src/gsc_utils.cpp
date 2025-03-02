@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 
 void gsc_utils_sendcommandtoclient()
 {

@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 
 #if COMPILE_SQLITE == 1
 

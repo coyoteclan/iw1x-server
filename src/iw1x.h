@@ -10,7 +10,7 @@
 #include <dlfcn.h>      // dlsym
 #include <sys/time.h>   // gettimeofday
 
-#include "shared.hpp"
+#include "shared.h"
 
 // Some declarations to be able to call before defined
 static void ban();

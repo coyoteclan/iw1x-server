@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 
 void gsc_entity_setbounds(scr_entref_t ref)
 {

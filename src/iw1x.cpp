@@ -1,5 +1,5 @@
-#include "iw1x.hpp"
-#include "hook.hpp"
+#include "iw1x.h"
+#include "hook.h"
 
 //// Cvars
 cvar_t *com_cl_running;

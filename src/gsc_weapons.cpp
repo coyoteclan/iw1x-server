@@ -1,4 +1,4 @@
-#include "shared.hpp"
+#include "shared.h"
 
 qboolean isValidWeaponId(int id)
 {
