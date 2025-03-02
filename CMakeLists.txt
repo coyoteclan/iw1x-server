@@ -1,30 +1,28 @@
 cmake_minimum_required(VERSION 3.10)
+project(iw1x-server)
 
-set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR i386)
-set(CMAKE_C_COMPILER gcc)
-set(CMAKE_CXX_COMPILER g++)
+# -m32:     32-bit
+# -fpic:    Position-independent code
+# -Wall:    Enable all warnings
+# -fvisibility=hidden: Hide symbols
+set(CMAKE_CXX_FLAGS "-m32 -fpic -Wall -fvisibility=hidden")
+set(CMAKE_SHARED_LINKER_FLAGS "-m32")
+set(CMAKE_LIBRARY_PATH "/lib32" "/usr/lib32" "/usr/lib/i386-linux-gnu" ${CMAKE_LIBRARY_PATH})
 
-project(iw1x)
-
-# Compiler Flags
-set(CMAKE_C_FLAGS "-m32 -I. -fPIC -Wall -fvisibility=hidden" CACHE STRING "C flags" FORCE)
-set(CMAKE_CXX_FLAGS "-m32 -I. -fPIC -Wall -fvisibility=hidden" CACHE STRING "C++ flags" FORCE)
-
-# Linker Flags
-set(CMAKE_SHARED_LINKER_FLAGS "-m32 -L/lib32" CACHE STRING "Shared linker flags" FORCE)
-link_directories(/usr/lib32 /usr/lib/i386-linux-gnu)
-
-# Compile Options
-option(DEBUG_BUILD "Enable debugging information, disable optimization" OFF)
-option(ENABLE_UNSAFE "Enable unsafe features (fread, fwrite...)" OFF)
+# Options
+option(DEBUG_BUILD "Include debug info, no optimization" OFF)
+option(ENABLE_UNSAFE "Enable risky features (fread, fwrite...)" OFF)
 option(COMPILE_SQLITE "SQLite support" OFF)
 option(COMPILE_CURL "cURL support" OFF)
-option(COMPILE_SSL "SSL support (hash)" OFF)
+option(COMPILE_SSL "SSL support" OFF)
 
+# -g:       Include debug info
+# -ggdb:    Debug info for gdb
+# -O2:      Moderate optimization
 if(DEBUG_BUILD)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -ggdb -O0")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb -O0")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -ggdb")
+else()
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 endif()
 
 if(ENABLE_UNSAFE)
@@ -34,7 +32,7 @@ else()
 endif()
 
 if(COMPILE_SQLITE)
-    find_library(SQLITE_LIB sqlite3 HINTS /usr/lib32 /usr/lib/i386-linux-gnu /usr/lib)
+    find_library(SQLITE_LIB sqlite3)
     if(SQLITE_LIB)
         add_definitions(-DCOMPILE_SQLITE=1)
         set(SQLITE_FOUND TRUE)
@@ -46,7 +44,7 @@ else()
 endif()
 
 if(COMPILE_CURL)
-    find_library(CURL_LIB curl HINTS /usr/lib/i386-linux-gnu)
+    find_library(CURL_LIB curl)
     if(CURL_LIB)
         add_definitions(-DCOMPILE_CURL=1)
         set(CURL_FOUND TRUE)
@@ -59,14 +57,12 @@ endif()
 
 if(COMPILE_SSL)
     add_definitions(-DCOMPILE_SSL=1)
-    set(OPENSSL_ROOT_DIR "/usr/lib/i386-linux-gnu")
-    set(OPENSSL_INCLUDE_DIR "/usr/include/openssl")
     find_package(OpenSSL REQUIRED)
 else()
     add_definitions(-DCOMPILE_SSL=0)
 endif()
 
-# Source files list
+# Source files
 set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/hook.cpp
     ${CMAKE_SOURCE_DIR}/src/iw1x.cpp
@@ -83,17 +79,12 @@ set(SOURCES
 
 if(SQLITE_FOUND)
     list(APPEND SOURCES ${CMAKE_SOURCE_DIR}/src/gsc_sqlite.cpp)
-    # append gsc_sqlite.cpp to SOURCES list if library found
 endif()
 
 if(CURL_FOUND)
     list(APPEND SOURCES ${CMAKE_SOURCE_DIR}/src/gsc_curl.cpp)
 endif()
 
-# Include directories for searching
-include_directories(${CMAKE_SOURCE_DIR}/src)
-
-# add shared library to project
 add_library(iw1x SHARED ${SOURCES})
 
 # Output properties
@@ -104,7 +95,7 @@ set_target_properties(iw1x PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
 )
 
-# Link libraries
+# Linked libraries
 target_link_libraries(iw1x
     dl
     pthread
@@ -121,3 +112,5 @@ endif()
 if(COMPILE_SSL)
     target_link_libraries(iw1x OpenSSL::SSL OpenSSL::Crypto)
 endif()
+
+set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
