@@ -12,18 +12,7 @@
 #include "types.hpp"
 #include "functions.hpp"
 
-#include "gsc_entity.hpp"
-#include "gsc_player.hpp"
-#include "gsc_bots.hpp"
-#include "gsc_weapons.hpp"
-#include "gsc_utils.hpp"
-#include "gsc_exec.hpp"
-#if COMPILE_SQLITE == 1
-#include "gsc_sqlite.hpp"
-#endif
-#if COMPILE_CURL == 1
-#include "gsc_curl.hpp"
-#endif
+#include "gsc.hpp"
 
 #define STACK_UNDEFINED 0
 #define STACK_STRING 1
