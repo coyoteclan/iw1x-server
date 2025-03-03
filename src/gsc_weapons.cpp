@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 qboolean isValidWeaponId(int id)
 {
@@ -23,20 +23,20 @@ void gsc_weapons_setweaponcookable()
     else if (!stackGetParams("ii", &id, &cookable))
     {
         stackError("gsc_weapons_setweaponcookable() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!isValidWeaponId(id))
     {
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     weaponinfo_t *weapon = BG_GetInfoForWeapon(id);
     weapon->cookOffHold = cookable;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_weapons_setweaponfusetime()
@@ -52,18 +52,18 @@ void gsc_weapons_setweaponfusetime()
     else if (!stackGetParams("ii", &id, &time))
     {
         stackError("gsc_weapons_setweaponfusetime() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!isValidWeaponId(id))
     {
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     weaponinfo_t *weapon = BG_GetInfoForWeapon(id);
     weapon->fuseTime = time;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }

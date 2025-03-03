@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 enum
 {
@@ -44,7 +44,7 @@ void gsc_exec()
     if (!stackGetParamString(0, &command))
     {
         stackError("gsc_exec() argument is undefined or has wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -57,7 +57,7 @@ void gsc_exec()
     if (fp == NULL)
     {
         Com_Printf("gsc_exec() popen failed: %s\n", strerror(errno));
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -65,15 +65,15 @@ void gsc_exec()
     int curpos = 0;
     char content[MAX_STRINGLENGTH];
 
-    stackPushArray();
+    Scr_MakeArray();
 
     while ((c = getc(fp)) != EOF)
     {
         if (c == '\n' || curpos == MAX_STRINGLENGTH - 1)
         {
             content[curpos] = '\0';
-            stackPushString(content);
-            stackPushArrayLast();
+            Scr_AddString(content);
+            Scr_AddArray();
             curpos = 0;
         }
         else
@@ -85,8 +85,8 @@ void gsc_exec()
 
     content[curpos] = '\0';
 
-    stackPushString(content);
-    stackPushArrayLast();
+    Scr_AddString(content);
+    Scr_AddArray();
 
     pclose(fp);
 }
@@ -149,7 +149,7 @@ void gsc_exec_async_create()
     if (!stackGetParamString(0, &command))
     {
         stackError("gsc_exec_async_create() argument is undefined or has wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -225,18 +225,18 @@ void gsc_exec_async_create()
     if (pthread_create(&exec_doer, NULL, exec_async, newtask) != 0)
     {
         stackError("gsc_exec_async_create() error creating exec async handler thread!");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (pthread_detach(exec_doer) != 0)
     {
         stackError("gsc_exec_async_create() error detaching exec async handler thread!");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushInt(1);
+    Scr_AddInt(1);
 }
 
 void gsc_exec_async_create_nosave()
@@ -247,7 +247,7 @@ void gsc_exec_async_create_nosave()
     if (!stackGetParamString(0, &command))
     {
         stackError("gsc_exec_async_create_nosave() argument is undefined or has wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -323,18 +323,18 @@ void gsc_exec_async_create_nosave()
     if (pthread_create(&exec_doer, NULL, exec_async, newtask) != 0)
     {
         stackError("gsc_exec_async_create_nosave() error creating exec async handler thread!");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (pthread_detach(exec_doer) != 0)
     {
         stackError("gsc_exec_async_create_nosave() error detaching exec async handler thread!");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushInt(1);
+    Scr_AddInt(1);
 }
 
 void gsc_exec_async_checkdone()
@@ -364,40 +364,40 @@ void gsc_exec_async_checkdone()
                         switch(task->valueType)
                         {
                         case INT_VALUE:
-                            stackPushInt(task->intValue);
+                            Scr_AddInt(task->intValue);
                             break;
 
                         case FLOAT_VALUE:
-                            stackPushFloat(task->floatValue);
+                            Scr_AddFloat(task->floatValue);
                             break;
 
                         case STRING_VALUE:
-                            stackPushString(task->stringValue);
+                            Scr_AddString(task->stringValue);
                             break;
 
                         case VECTOR_VALUE:
-                            stackPushVector(task->vectorValue);
+                            Scr_AddVector(task->vectorValue);
                             break;
 
                         case OBJECT_VALUE:
-                            stackPushObject(task->objectValue);
+                            Scr_AddObject(task->objectValue);
                             break;
 
                         default:
-                            stackPushUndefined();
+                            Scr_AddUndefined();
                             break;
                         }
                     }
 
-                    stackPushArray();
+                    Scr_MakeArray();
                     exec_outputline *output = task->output;
                     bool hasoutput = false;
 
                     while (output != NULL)
                     {
                         exec_outputline *next = output->next;
-                        stackPushString(output->content);
-                        stackPushArrayLast();
+                        Scr_AddString(output->content);
+                        Scr_AddArray();
                         delete output;
                         output = next;
                         hasoutput = true;
@@ -405,8 +405,8 @@ void gsc_exec_async_checkdone()
 
                     if (!hasoutput)
                     {
-                        stackPushUndefined();
-                        stackPushArrayLast();
+                        Scr_AddUndefined();
+                        Scr_AddArray();
                     }
                     
                     short ret = Scr_ExecThread(task->callback, task->save + task->hasargument);

@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
+
 project(iw1x-server)
+
+set(SEPARATOR "---------------------")
 
 # -m32:     32-bit
 # -fpic:    Position-independent code
@@ -12,9 +15,17 @@ set(CMAKE_LIBRARY_PATH "/lib32" "/usr/lib32" "/usr/lib/i386-linux-gnu" ${CMAKE_L
 # Options
 option(DEBUG_BUILD "Include debug info, no optimization" OFF)
 option(ENABLE_UNSAFE "Enable risky features (fread, fwrite...)" OFF)
-option(COMPILE_SQLITE "SQLite support" OFF)
-option(COMPILE_CURL "cURL support" OFF)
 option(COMPILE_SSL "SSL support" OFF)
+option(COMPILE_CURL "cURL support" OFF)
+option(COMPILE_SQLITE "SQLite support" OFF)
+
+message(STATUS "${SEPARATOR}")
+message(STATUS "Debug: ${DEBUG_BUILD}")
+message(STATUS "Risky features: ${ENABLE_UNSAFE}")
+message(STATUS "SSL: ${COMPILE_SSL}")
+message(STATUS "cURL: ${COMPILE_CURL}")
+message(STATUS "SQLite: ${COMPILE_SQLITE}")
+message(STATUS "${SEPARATOR}")
 
 # -g:       Include debug info
 # -ggdb:    Debug info for gdb
@@ -66,7 +77,6 @@ endif()
 set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/hook.cpp
     ${CMAKE_SOURCE_DIR}/src/iw1x.cpp
-    ${CMAKE_SOURCE_DIR}/deps/qvsnprintf.c
     ${CMAKE_SOURCE_DIR}/src/gsc.cpp
     ${CMAKE_SOURCE_DIR}/src/gsc_entity.cpp
     ${CMAKE_SOURCE_DIR}/src/gsc_player.cpp
@@ -86,6 +96,7 @@ if(CURL_FOUND)
 endif()
 
 add_library(iw1x SHARED ${SOURCES})
+target_precompile_headers(iw1x PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 
 # Output properties
 set_target_properties(iw1x PROPERTIES
@@ -112,5 +123,3 @@ endif()
 if(COMPILE_SSL)
     target_link_libraries(iw1x OpenSSL::SSL OpenSSL::Crypto)
 endif()
-
-set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})

@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 const char * getParamTypeAsString(int type)
 {
@@ -228,7 +228,7 @@ void stackError(const char *format, ...)
     va_list va;
 
     va_start(va, format);
-    Q_vsnprintf(s, sizeof(s) - 1, format, va);
+    vsnprintf(s, sizeof(s) - 1, format, va);
     va_end(va);
 
     len = strlen(s);
@@ -484,7 +484,7 @@ void gsc_testmethod(scr_entref_t ref)
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_player_testcommand() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
     

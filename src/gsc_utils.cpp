@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 void gsc_utils_sendcommandtoclient()
 {
@@ -8,12 +8,12 @@ void gsc_utils_sendcommandtoclient()
     if (!stackGetParams("is", &clientNum, &message))
     {
         stackError("gsc_utils_sendcommandtoclient() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     trap_SendServerCommand(clientNum, SV_CMD_CAN_IGNORE, message);
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_utils_logprintconsole()
@@ -23,20 +23,20 @@ void gsc_utils_logprintconsole()
     if (!stackGetParams("s", &str))
     {
         stackError("gsc_utils_logprintconsole() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!strlen(str) || strlen(str) > MAX_STRINGLENGTH)
     {
         stackError("gsc_utils_logprintconsole() invalid string length");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     Com_Printf("%s", str);
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_utils_getsubstr()
@@ -74,7 +74,7 @@ void gsc_utils_getsubstr()
     }
 
     tempString[i] = 0;
-    stackPushString(tempString);
+    Scr_AddString(tempString);
 }
 
 void gsc_utils_getascii()
@@ -84,18 +84,18 @@ void gsc_utils_getascii()
     if (!stackGetParams("s", &str))
     {
         stackError("gsc_utils_getascii() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!strlen(str))
     {
         stackError("gsc_utils_getascii() string length is 0");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushInt(str[0]);
+    Scr_AddInt(str[0]);
 }
 
 void gsc_utils_toupper()
@@ -105,18 +105,18 @@ void gsc_utils_toupper()
     if (!stackGetParams("s", &str))
     {
         stackError("gsc_utils_toupper() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!strlen(str))
     {
         stackError("gsc_utils_toupper() string length is 0");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushString(Q_strupr(str));
+    Scr_AddString(Q_strupr(str));
 }
 
 void gsc_utils_tolower() // From cod2rev
@@ -129,7 +129,7 @@ void gsc_utils_tolower() // From cod2rev
     if (!stackGetParams("s", &string))
     {
         stackError("gsc_utils_tolower() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -140,7 +140,7 @@ void gsc_utils_tolower() // From cod2rev
 
         if (!c)
         {
-            stackPushString(tempString);
+            Scr_AddString(tempString);
             return;
         }
 
@@ -216,7 +216,7 @@ void gsc_utils_replace() //TODO: check if needs improvements
     if (!stackGetParams("sss", &orig, &rep, &with))
     {
         stackError("gsc_utils_replace() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
     
@@ -261,7 +261,7 @@ void gsc_utils_replace() //TODO: check if needs improvements
     }
     strcpy(tmp, orig);
     
-    stackPushString(result);
+    Scr_AddString(result);
 }
 
 void gsc_utils_file_exists()
@@ -271,12 +271,12 @@ void gsc_utils_file_exists()
     if (!stackGetParams("s", &filename))
     {
         stackError("gsc_utils_file_exists() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     int file_exists = access(filename, F_OK) != -1;
-    stackPushInt(file_exists);
+    Scr_AddInt(file_exists);
 }
 
 void gsc_utils_fopen()
@@ -287,7 +287,7 @@ void gsc_utils_fopen()
     if (!stackGetParams("ss", &filename, &mode))
     {
         stackError("gsc_utils_fopen() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -296,11 +296,11 @@ void gsc_utils_fopen()
     if (!file)
     {
         stackError("gsc_utils_fopen() returned an error");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushInt((int)file);
+    Scr_AddInt((int)file);
 }
 
 void gsc_utils_fread()
@@ -310,14 +310,14 @@ void gsc_utils_fread()
     if (!stackGetParams("i", &file))
     {
         stackError("gsc_utils_fread() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!file)
     {
         stackError("gsc_utils_fread() returned an error");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -326,12 +326,12 @@ void gsc_utils_fread()
 
     if (!ret)
     {
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     buffer[ret] = '\0';
-    stackPushString(buffer);
+    Scr_AddString(buffer);
 }
 
 void gsc_utils_fwrite()
@@ -342,18 +342,18 @@ void gsc_utils_fwrite()
     if (!stackGetParams("is", &file, &buffer))
     {
         stackError("gsc_utils_fwrite() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!file)
     {
         stackError("gsc_utils_fwrite() returned an error");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushInt(fwrite(buffer, 1, strlen(buffer), file));
+    Scr_AddInt(fwrite(buffer, 1, strlen(buffer), file));
 }
 
 void gsc_utils_fclose()
@@ -363,30 +363,30 @@ void gsc_utils_fclose()
     if (!stackGetParams("i", &file))
     {
         stackError("gsc_utils_fclose() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!file)
     {
         stackError("gsc_utils_fclose() returned an error");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushInt(fclose(file));
+    Scr_AddInt(fclose(file));
 }
 
 static int starttime = time(NULL);
 void gsc_utils_getserverstarttime()
 {
-    stackPushInt(starttime);
+    Scr_AddInt(starttime);
 }
 
 void gsc_utils_getsystemtime()
 {
     time_t timer;
-    stackPushInt(time(&timer));
+    Scr_AddInt(time(&timer));
 }
 
 void gsc_utils_strftime()
@@ -398,7 +398,7 @@ void gsc_utils_strftime()
     if (!stackGetParams("iss", &timestamp, &timezone, &format))
     {
         stackError("gsc_utils_strftime() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -412,17 +412,17 @@ void gsc_utils_strftime()
     else
     {
         stackError("gsc_utils_strftime() invalid argument '%s'. Valid arguments are: 'utc' 'local'", timezone);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     char buffer[100];
     if(strftime(buffer, sizeof(buffer), format, timeInfo))
-        stackPushString(buffer);
+        Scr_AddString(buffer);
     else
     {
         stackError("gsc_utils_strftime() failed to format time");
-        stackPushUndefined();
+        Scr_AddUndefined();
     }
 }
 
@@ -433,23 +433,23 @@ void gsc_utils_getconfigstring()
     if (!stackGetParams("i", &index))
     {
         stackError("gsc_utils_getconfigstring() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
     
     if (index < 0 || index >= MAX_CONFIGSTRINGS)
     {
         stackError("gsc_utils_getconfigstring() configstring index is out of range");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     const char *string = trap_GetConfigstringConst(index);
 
     if (!*string)
-        stackPushUndefined();
+        Scr_AddUndefined();
     else
-        stackPushString(string);
+        Scr_AddString(string);
 }
 
 void gsc_utils_makelocalizedstring()
@@ -459,11 +459,11 @@ void gsc_utils_makelocalizedstring()
     if (!stackGetParams("s", &str))
     {
         stackError("gsc_utils_makelocalizedstring() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushString(str);
+    Scr_AddString(str);
 
     VariableValue *var;
     int param = 0;
@@ -479,11 +479,11 @@ void gsc_utils_getlocalizedstringindex()
     if (!stackGetParams("l", &str))
     {
         stackError("gsc_utils_getlocalizedstringindex() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushInt(G_LocalizedStringIndex(str));
+    Scr_AddInt(G_LocalizedStringIndex(str));
 }
 
 void gsc_utils_makeupdatedlocalizedstring()
@@ -494,13 +494,13 @@ void gsc_utils_makeupdatedlocalizedstring()
     if (!stackGetParams("si", &str, &index))
     {
         stackError("gsc_utils_makeupdatedlocalizedstring() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
     
     trap_SetConfigstring(index + 1244, str);
     
-    stackPushString(str);
+    Scr_AddString(str);
 
     VariableValue *var;
     int param = 0;
@@ -550,7 +550,7 @@ void gsc_utils_strip()
     if(!stackGetParams("s", &input)) 
     {
         stackError("gsc_utils_strip() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
     
@@ -561,7 +561,7 @@ void gsc_utils_strip()
 
     if(input[start] == '\0') 
     {
-        stackPushString("");
+        Scr_AddString("");
         return;
     }
 
@@ -576,7 +576,7 @@ void gsc_utils_strip()
         result[i - start] = input[i];
     }
 
-    stackPushString(result);
+    Scr_AddString(result);
 }
 
 void gsc_utils_strstr() 
@@ -586,17 +586,17 @@ void gsc_utils_strstr()
     if(!stackGetParams("ss", &str, &sub)) 
     {
         stackError("gsc_utils_pmatch() arguments are undefined or have a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (strstr(str, sub) != NULL) 
     {
-        stackPushBool(qtrue);
+        Scr_AddBool(qtrue);
     } 
     else 
     {
-        stackPushBool(qfalse);
+        Scr_AddBool(qfalse);
     }
 }
 
@@ -607,7 +607,7 @@ void gsc_utils_monotone()
     if(!stackGetParams("s", &input)) 
     {
         stackError("gsc_utils_monotone() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -636,7 +636,7 @@ void gsc_utils_monotone()
     }
     *dst = '\0';
 
-    stackPushString(buffer);
+    Scr_AddString(buffer);
 }
 
 void gsc_utils_gettype()
@@ -644,11 +644,11 @@ void gsc_utils_gettype()
     if (Scr_GetNumParam() == 0)
     {
         stackError("gsc_utils_gettype() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushString(stackGetParamTypeAsString(0));
+    Scr_AddString(stackGetParamTypeAsString(0));
 }
 
 #if COMPILE_SSL == 1
@@ -660,7 +660,7 @@ void gsc_utils_hash()
     if(!stackGetParams("si", &input, &_len))
     {
         stackError("gsc_utils_hash() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
     if(_len > 64) {
@@ -676,7 +676,7 @@ void gsc_utils_hash()
     if(mdctx == NULL)
     {
         stackError("Failed to create EVP_MD_CTX");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -684,7 +684,7 @@ void gsc_utils_hash()
     {
         EVP_MD_CTX_free(mdctx);
         stackError("Failed to initialize digest");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -692,7 +692,7 @@ void gsc_utils_hash()
     {
         EVP_MD_CTX_free(mdctx);
         stackError("Failed to update digest");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -700,7 +700,7 @@ void gsc_utils_hash()
     {
         EVP_MD_CTX_free(mdctx);
         stackError("Failed to finalize digest");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -714,6 +714,6 @@ void gsc_utils_hash()
 
     hashed_str[_len] = '\0';
 
-    stackPushString(hashed_str);
+    Scr_AddString(hashed_str);
 }
 #endif

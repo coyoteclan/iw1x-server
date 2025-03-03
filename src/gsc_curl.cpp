@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 #if COMPILE_CURL == 1
 struct WebhookData
@@ -44,7 +44,7 @@ void gsc_curl_webhookmessage()
     if (!stackGetParams("ss", &url, &message))
     {
         stackError("gsc_curl_webhookmessage() one or more arguments are undefined or have a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -54,6 +54,6 @@ void gsc_curl_webhookmessage()
 
     std::thread(async_webhook_message, data).detach();
 
-    stackPushBool(qtrue);  // Return true to indicate the async operation has started
+    Scr_AddBool(qtrue);  // Return true to indicate the async operation has started
 }
 #endif

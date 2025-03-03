@@ -1,5 +1,4 @@
 #include "iw1x.h"
-#include "hook.h"
 
 //// Cvars
 cvar_t *com_cl_running;
@@ -768,8 +767,8 @@ bool SVC_callback(const char *str, const char *ip)
 {
     if (codecallback_client_spam && Scr_IsSystemActive())
     {
-        stackPushString(ip);
-        stackPushString(str);
+        Scr_AddString(ip);
+        Scr_AddString(str);
         short ret = Scr_ExecThread(codecallback_client_spam, 2);
         Scr_FreeThread(ret);
 
@@ -1408,9 +1407,9 @@ void Scr_CodeCallback_Error(qboolean terminal, qboolean emit, const char *intern
 
         if (terminal || emit)
         {
-            stackPushString(message);
-            stackPushString(internal_function);
-            stackPushInt(terminal);
+            Scr_AddString(message);
+            Scr_AddString(internal_function);
+            Scr_AddInt(terminal);
             short ret = Scr_ExecThread(codecallback_error, 3);
             Scr_FreeThread(ret);
         }
@@ -2445,7 +2444,7 @@ void hook_ClientCommand(int clientNum)
         return;
     }
 
-    stackPushArray();
+    Scr_MakeArray();
     int args = Cmd_Argc();
     for (int i = 0; i < args; i++)
     {
@@ -2456,15 +2455,15 @@ void hook_ClientCommand(int clientNum)
             char *part = strtok(tmp + 1, " ");
             while (part != NULL)
             {
-                stackPushString(part);
-                stackPushArrayLast();
+                Scr_AddString(part);
+                Scr_AddArray();
                 part = strtok(NULL, " ");
             }
         }
         else
         {
-            stackPushString(tmp);
-            stackPushArrayLast();
+            Scr_AddString(tmp);
+            Scr_AddArray();
         }
     }
     

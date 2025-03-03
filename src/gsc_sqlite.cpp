@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 #if COMPILE_SQLITE == 1
 
@@ -202,7 +202,7 @@ void gsc_async_sqlite_initialize()
         if (pthread_mutex_init(&async_sqlite_mutex_lock, NULL) != 0)
         {
             stackError("gsc_async_sqlite_initialize() failed to initialize async_sqlite_mutex_lock mutex!");
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
@@ -211,14 +211,14 @@ void gsc_async_sqlite_initialize()
         if (pthread_create(&async_handler, NULL, async_sqlite_query_handler, NULL) != 0)
         {
             stackError("gsc_async_sqlite_initialize() error creating async handler thread!");
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
         if (pthread_detach(async_handler) != 0)
         {
             stackError("gsc_async_sqlite_initialize() error detaching async handler thread!");
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
@@ -227,7 +227,7 @@ void gsc_async_sqlite_initialize()
     else
         Com_DPrintf("gsc_async_sqlite_initialize() async handler already initialized.\n");
 
-    stackPushInt(async_sqlite_initialized);
+    Scr_AddInt(async_sqlite_initialized);
 }
 
 void gsc_async_sqlite_create_query()
@@ -238,14 +238,14 @@ void gsc_async_sqlite_create_query()
     if (!stackGetParams("is", &db, &query))
     {
         stackError("gsc_async_sqlite_create_query() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!async_sqlite_initialized)
     {
         stackError("gsc_async_sqlite_create_query() async handler has not been initialized");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -258,7 +258,7 @@ void gsc_async_sqlite_create_query()
         if (task_count >= MAX_SQLITE_TASKS - 2)
         {
             stackError("gsc_async_sqlite_create_query() exceeded async task limit");
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
@@ -332,7 +332,7 @@ void gsc_async_sqlite_create_query()
     else
         first_async_sqlite_task = newtask;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_async_sqlite_create_query_nosave()
@@ -343,14 +343,14 @@ void gsc_async_sqlite_create_query_nosave()
     if (!stackGetParams("is", &db, &query))
     {
         stackError("gsc_async_sqlite_create_query_nosave() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!async_sqlite_initialized)
     {
         stackError("gsc_async_sqlite_create_query_nosave() async handler has not been initialized");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -363,7 +363,7 @@ void gsc_async_sqlite_create_query_nosave()
         if (task_count >= MAX_SQLITE_TASKS - 2)
         {
             stackError("gsc_async_sqlite_create_query_nosave() exceeded async task limit");
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
@@ -437,7 +437,7 @@ void gsc_async_sqlite_create_query_nosave()
     else
         first_async_sqlite_task = newtask;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_async_sqlite_create_entity_query(scr_entref_t entref)
@@ -448,14 +448,14 @@ void gsc_async_sqlite_create_entity_query(scr_entref_t entref)
     if (!stackGetParams("is", &db, &query))
     {
         stackError("gsc_async_sqlite_create_entity_query() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!async_sqlite_initialized)
     {
         stackError("gsc_async_sqlite_create_entity_query() async handler has not been initialized");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -468,7 +468,7 @@ void gsc_async_sqlite_create_entity_query(scr_entref_t entref)
         if (task_count >= MAX_SQLITE_TASKS - 2)
         {
             stackError("gsc_async_sqlite_create_entity_query() exceeded async task limit");
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
@@ -542,7 +542,7 @@ void gsc_async_sqlite_create_entity_query(scr_entref_t entref)
     else
         first_async_sqlite_task = newtask;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_async_sqlite_create_entity_query_nosave(scr_entref_t entref)
@@ -553,14 +553,14 @@ void gsc_async_sqlite_create_entity_query_nosave(scr_entref_t entref)
     if (!stackGetParams("is", &db, &query))
     {
         stackError("gsc_async_sqlite_create_entity_query_nosave() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (!async_sqlite_initialized)
     {
         stackError("gsc_async_sqlite_create_entity_query_nosave() async handler has not been initialized");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -573,7 +573,7 @@ void gsc_async_sqlite_create_entity_query_nosave(scr_entref_t entref)
         if (task_count >= MAX_SQLITE_TASKS - 2)
         {
             stackError("gsc_async_sqlite_create_entity_query_nosave() exceeded async task limit");
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
@@ -647,7 +647,7 @@ void gsc_async_sqlite_create_entity_query_nosave(scr_entref_t entref)
     else
         first_async_sqlite_task = newtask;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_async_sqlite_checkdone()
@@ -676,44 +676,44 @@ void gsc_async_sqlite_checkdone()
                                     switch(task->valueType)
                                     {
                                     case INT_VALUE:
-                                        stackPushInt(task->intValue);
+                                        Scr_AddInt(task->intValue);
                                         break;
 
                                     case FLOAT_VALUE:
-                                        stackPushFloat(task->floatValue);
+                                        Scr_AddFloat(task->floatValue);
                                         break;
 
                                     case STRING_VALUE:
-                                        stackPushString(task->stringValue);
+                                        Scr_AddString(task->stringValue);
                                         break;
 
                                     case VECTOR_VALUE:
-                                        stackPushVector(task->vectorValue);
+                                        Scr_AddVector(task->vectorValue);
                                         break;
 
                                     case OBJECT_VALUE:
-                                        stackPushObject(task->objectValue);
+                                        Scr_AddObject(task->objectValue);
                                         break;
 
                                     default:
-                                        stackPushUndefined();
+                                        Scr_AddUndefined();
                                         break;
                                     }
                                 }
 
-                                stackPushArray();
+                                Scr_MakeArray();
 
                                 for (int i = 0; i < task->fields_size; i++)
                                 {
-                                    stackPushArray();
+                                    Scr_MakeArray();
 
                                     for (int x = 0; x < task->rows_size; x++)
                                     {
-                                        stackPushString(task->row[i][x]);
-                                        stackPushArrayLast();
+                                        Scr_AddString(task->row[i][x]);
+                                        Scr_AddArray();
                                     }
 
-                                    stackPushArrayLast();
+                                    Scr_AddArray();
                                 }
 
                                 short ret = Scr_ExecEntThread(task->gentity, task->callback, task->save + task->hasargument);
@@ -727,40 +727,40 @@ void gsc_async_sqlite_checkdone()
                                 switch(task->valueType)
                                 {
                                 case INT_VALUE:
-                                    stackPushInt(task->intValue);
+                                    Scr_AddInt(task->intValue);
                                     break;
 
                                 case FLOAT_VALUE:
-                                    stackPushFloat(task->floatValue);
+                                    Scr_AddFloat(task->floatValue);
                                     break;
 
                                 case STRING_VALUE:
-                                    stackPushString(task->stringValue);
+                                    Scr_AddString(task->stringValue);
                                     break;
 
                                 case VECTOR_VALUE:
-                                    stackPushVector(task->vectorValue);
+                                    Scr_AddVector(task->vectorValue);
                                     break;
 
                                 default:
-                                    stackPushUndefined();
+                                    Scr_AddUndefined();
                                     break;
                                 }
                             }
 
-                            stackPushArray();
+                            Scr_MakeArray();
 
                             for (int i = 0; i < task->fields_size; i++)
                             {
-                                stackPushArray();
+                                Scr_MakeArray();
 
                                 for (int x = 0; x < task->rows_size; x++)
                                 {
-                                    stackPushString(task->row[i][x]);
-                                    stackPushArrayLast();
+                                    Scr_AddString(task->row[i][x]);
+                                    Scr_AddArray();
                                 }
 
-                                stackPushArrayLast();
+                                Scr_AddArray();
                             }
 
                             short ret = Scr_ExecThread(task->callback, task->save + task->hasargument);
@@ -801,7 +801,7 @@ void gsc_sqlite_open()
     if (!stackGetParams("s", &database))
     {
         stackError("gsc_sqlite_open() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -812,7 +812,7 @@ void gsc_sqlite_open()
     if (rc != SQLITE_OK)
     {
         stackError("gsc_sqlite_open() cannot open database: %s", sqlite3_errmsg(db));
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -822,7 +822,7 @@ void gsc_sqlite_open()
     {
         stackError("gsc_sqlite_open() cannot set database busy timeout: %s", sqlite3_errmsg(db));
         sqlite3_close(db);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -836,7 +836,7 @@ void gsc_sqlite_open()
         {
             stackError("gsc_sqlite_open() exceeded db store limit");
             sqlite3_close(db);
-            stackPushUndefined();
+            Scr_AddUndefined();
             return;
         }
 
@@ -856,7 +856,7 @@ void gsc_sqlite_open()
     else
         first_sqlite_db_store = newstore;
 
-    stackPushInt((int)db);
+    Scr_AddInt((int)db);
 }
 
 void gsc_sqlite_query()
@@ -867,7 +867,7 @@ void gsc_sqlite_query()
     if (!stackGetParams("is", &db, &query))
     {
         stackError("gsc_sqlite_query() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -879,10 +879,10 @@ void gsc_sqlite_query()
     if (result != SQLITE_OK)
     {
         stackError("gsc_sqlite_query() failed to fetch query data: %s", sqlite3_errmsg((sqlite3 *)db));
-        stackPushUndefined();
+        Scr_AddUndefined();
     }
 
-    stackPushArray();
+    Scr_MakeArray();
 
     result = sqlite3_step(statement);
 
@@ -890,7 +890,7 @@ void gsc_sqlite_query()
     {
         if (result == SQLITE_ROW)
         {
-            stackPushArray();
+            Scr_MakeArray();
 
             for (int i = 0; i < sqlite3_column_count(statement); i++)
             {
@@ -898,17 +898,17 @@ void gsc_sqlite_query()
 
                 if (text != NULL)
                 {
-                    stackPushString(reinterpret_cast<const char*>(text));
-                    stackPushArrayLast();
+                    Scr_AddString(reinterpret_cast<const char*>(text));
+                    Scr_AddArray();
                 }
             }
 
-            stackPushArrayLast();
+            Scr_AddArray();
         }
         else
         {
             stackError("gsc_sqlite_query() failed to execute query: %s", sqlite3_errmsg((sqlite3 *)db));
-            stackPushUndefined();
+            Scr_AddUndefined();
             sqlite3_finalize(statement);
             return;
         }
@@ -926,7 +926,7 @@ void gsc_sqlite_close()
     if (!stackGetParams("i", &db))
     {
         stackError("gsc_sqlite_close() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -935,7 +935,7 @@ void gsc_sqlite_close()
     if (rc != SQLITE_OK)
     {
         stackError("gsc_sqlite_close() cannot close database: %s", sqlite3_errmsg((sqlite3 *)db));
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -960,7 +960,7 @@ void gsc_sqlite_close()
         }
     }
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_sqlite_escape_string()
@@ -970,13 +970,13 @@ void gsc_sqlite_escape_string()
     if (!stackGetParams("s", &string))
     {
         stackError("gsc_sqlite_escape_string() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     char *result = sqlite3_mprintf("%q", string);
 
-    stackPushString(result);
+    Scr_AddString(result);
     sqlite3_free(result);
 }
 
@@ -992,7 +992,7 @@ void gsc_sqlite_databases_count()
         store_count++;
     }
 
-    stackPushInt(store_count);
+    Scr_AddInt(store_count);
 }
 
 void gsc_sqlite_tasks_count()
@@ -1007,7 +1007,7 @@ void gsc_sqlite_tasks_count()
         task_count++;
     }
 
-    stackPushInt(task_count);
+    Scr_AddInt(task_count);
 }
 
 #endif

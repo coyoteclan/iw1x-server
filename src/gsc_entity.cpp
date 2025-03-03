@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 void gsc_entity_setbounds(scr_entref_t ref)
 {
@@ -8,7 +8,7 @@ void gsc_entity_setbounds(scr_entref_t ref)
     if (!stackGetParams("ff", &width, &height))
     {
         stackError("gsc_entity_setbounds() one or more arguments is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -20,7 +20,7 @@ void gsc_entity_setbounds(scr_entref_t ref)
     VectorCopy(mins, entity->r.mins);
     VectorCopy(maxs, entity->r.maxs);
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_entity_setclipmask(scr_entref_t ref)
@@ -29,7 +29,7 @@ void gsc_entity_setclipmask(scr_entref_t ref)
     gentity_t *ent = &g_entities[id];
 
     ent->clipmask = Scr_GetInt(0);
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_entity_getclipmask(scr_entref_t ref)
@@ -37,7 +37,7 @@ void gsc_entity_getclipmask(scr_entref_t ref)
     int id = ref.entnum;
     gentity_t *ent = &g_entities[id];
 
-    stackPushInt(ent->clipmask);
+    Scr_AddInt(ent->clipmask);
 }
 
 void gsc_entity_showtoplayer(scr_entref_t ref) //TODO: try like cod2rev instead
@@ -51,7 +51,7 @@ void gsc_entity_showtoplayer(scr_entref_t ref) //TODO: try like cod2rev instead
     {
         pEnt->r.svFlags &= ~SVF_SINGLECLIENT;
         pEnt->r.singleClient = 0;
-        stackPushBool(qtrue);
+        Scr_AddBool(qtrue);
         return;
     }
     
@@ -65,5 +65,5 @@ void gsc_entity_showtoplayer(scr_entref_t ref) //TODO: try like cod2rev instead
     pEnt->r.svFlags |= SVF_SINGLECLIENT;
     pEnt->r.singleClient = clientEnt->s.number;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }

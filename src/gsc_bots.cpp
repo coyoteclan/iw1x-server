@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "gsc.h"
 
 void gsc_bots_setbotstance(scr_entref_t ref)
 {
@@ -8,14 +8,14 @@ void gsc_bots_setbotstance(scr_entref_t ref)
     if (!stackGetParams("s", &stance))
     {
         stackError("gsc_bots_setbotstance() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_setbotstance() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -24,7 +24,7 @@ void gsc_bots_setbotstance(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_setbotstance() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -42,11 +42,11 @@ void gsc_bots_setbotstance(scr_entref_t ref)
     else
     {
         stackError("gsc_bots_setbotstance() invalid argument '%s'. Valid arguments are: 'stand' 'crouch' 'prone' 'jump'", stance);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_meleeweapon(scr_entref_t ref)
@@ -57,14 +57,14 @@ void gsc_bots_meleeweapon(scr_entref_t ref)
     if (!stackGetParams("i", &melee))
     {
         stackError("gsc_bots_meleeweapon() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_meleeweapon() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -73,7 +73,7 @@ void gsc_bots_meleeweapon(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_meleeweapon() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -82,7 +82,7 @@ void gsc_bots_meleeweapon(scr_entref_t ref)
     else
         customPlayerState[id].botButtons |= KEY_MASK_MELEE;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_setaim(scr_entref_t ref)
@@ -93,14 +93,14 @@ void gsc_bots_setaim(scr_entref_t ref)
     if (!stackGetParams("i", &ads))
     {
         stackError("gsc_bots_setaim() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_setaim() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -109,7 +109,7 @@ void gsc_bots_setaim(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_setaim() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -118,7 +118,7 @@ void gsc_bots_setaim(scr_entref_t ref)
     else
         customPlayerState[id].botButtons |= KEY_MASK_ADS_MODE;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_fireweapon(scr_entref_t ref)
@@ -129,14 +129,14 @@ void gsc_bots_fireweapon(scr_entref_t ref)
     if (!stackGetParams("i", &shoot))
     {
         stackError("gsc_bots_fireweapon() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_fireweapon() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -145,7 +145,7 @@ void gsc_bots_fireweapon(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_fireweapon() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -154,7 +154,7 @@ void gsc_bots_fireweapon(scr_entref_t ref)
     else
         customPlayerState[id].botButtons |= KEY_MASK_FIRE;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_setlean(scr_entref_t ref)
@@ -165,14 +165,14 @@ void gsc_bots_setlean(scr_entref_t ref)
     if (!stackGetParams("s", &lean))
     {
         stackError("gsc_bots_setlean() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_setlean() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -181,7 +181,7 @@ void gsc_bots_setlean(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_setlean() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -194,11 +194,11 @@ void gsc_bots_setlean(scr_entref_t ref)
     else
     {
         stackError("gsc_bots_setlean() invalid argument '%s'. Valid arguments are: 'right' 'left'", lean);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_reloadweapon(scr_entref_t ref)
@@ -209,14 +209,14 @@ void gsc_bots_reloadweapon(scr_entref_t ref)
     if (!stackGetParams("i", &reload))
     {
         stackError("gsc_bots_reloadweapon() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_reloadweapon() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -225,7 +225,7 @@ void gsc_bots_reloadweapon(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_reloadweapon() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -234,7 +234,7 @@ void gsc_bots_reloadweapon(scr_entref_t ref)
     else
         customPlayerState[id].botWButtons |= KEY_MASK_RELOAD;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_switchtoweaponid(scr_entref_t ref)
@@ -245,14 +245,14 @@ void gsc_bots_switchtoweaponid(scr_entref_t ref)
     if (!stackGetParams("i", &weaponid))
     {
         stackError("gsc_bots_switchtoweaponid() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_switchtoweaponid() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -261,13 +261,13 @@ void gsc_bots_switchtoweaponid(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_switchtoweaponid() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     customPlayerState[id].botWeapon = weaponid;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_setwalkdir(scr_entref_t ref)
@@ -278,14 +278,14 @@ void gsc_bots_setwalkdir(scr_entref_t ref)
     if (!stackGetParams("s", &dir))
     {
         stackError("gsc_bots_setwalkdir() argument is undefined or has a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     if (id >= MAX_CLIENTS)
     {
         stackError("gsc_bots_setwalkdir() entity %i is not a player", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -294,7 +294,7 @@ void gsc_bots_setwalkdir(scr_entref_t ref)
     if (client->netchan.remoteAddress.type != NA_BOT)
     {
         stackError("gsc_bots_setwalkdir() player %i is not a bot", id);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
@@ -314,11 +314,11 @@ void gsc_bots_setwalkdir(scr_entref_t ref)
     else
     {
         stackError("gsc_bots_setwalkdir() invalid argument '%s'. Valid arguments are: 'none' 'forward' 'back' 'right' 'left'", dir);
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }
 
 void gsc_bots_setwalkvalues(scr_entref_t ref)
@@ -330,12 +330,12 @@ void gsc_bots_setwalkvalues(scr_entref_t ref)
     if (!stackGetParams("ii", &fwcount, &rgcount))
     {
         stackError("gsc_bots_setwalkvalues() arguments are undefined or have a wrong type");
-        stackPushUndefined();
+        Scr_AddUndefined();
         return;
     }
 
     customPlayerState[id].botForwardMove = fwcount;
     customPlayerState[id].botRightMove = rgcount;
 
-    stackPushBool(qtrue);
+    Scr_AddBool(qtrue);
 }

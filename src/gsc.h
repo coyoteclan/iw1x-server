@@ -1,18 +1,34 @@
-#include <ctime>
+#ifndef GSC_H
+#define GSC_H
 
-#include <pthread.h>
+#include "shared.h"
 
-#if COMPILE_SSL == 1
-#include <openssl/evp.h>
-#endif
+#define STACK_UNDEFINED 0
+#define STACK_STRING 1
+#define STACK_LOCALIZED_STRING 2
+#define STACK_VECTOR 3
+#define STACK_FLOAT 4
+#define STACK_INT 5
+#define STACK_OBJECT 7
+#define STACK_FUNCTION 9
 
-#if COMPILE_CURL == 1
-#include <curl/curl.h>
-#include <thread>
-#include <memory>
+const char * stackGetParamTypeAsString(int param);
+int stackGetParams(const char *params, ...);
+void stackError(const char *format, ...);
 
-void gsc_curl_webhookmessage();
-#endif
+int stackGetParamInt(int param, int *value);
+int stackGetParamFunction(int param, int *value);
+int stackGetParamString(int param, char **value);
+int stackGetParamConstString(int param, unsigned int *value);
+int stackGetParamLocalizedString(int param, char **value);
+int stackGetParamVector(int param, vec3_t value);
+int stackGetParamFloat(int param, float *value);
+int stackGetParamObject(int param, unsigned int *value);
+
+//// For tests
+void gsc_testfunction();
+void gsc_testmethod(scr_entref_t ref);
+////
 
 //// Entity
 void gsc_entity_setbounds(scr_entref_t ref);
@@ -79,6 +95,7 @@ void gsc_weapons_setweaponfusetime();
 
 //// Utils
 #if COMPILE_SSL == 1
+#include <openssl/evp.h>
 void gsc_utils_hash();
 #endif
 
@@ -118,6 +135,13 @@ void gsc_exec_async_create_nosave();
 void gsc_exec_async_checkdone();
 ////
 
+#if COMPILE_CURL == 1
+#include <curl/curl.h>
+#include <thread>
+#include <memory>
+void gsc_curl_webhookmessage();
+#endif
+
 //// SQLite
 void gsc_sqlite_open();
 void gsc_sqlite_query();
@@ -130,9 +154,8 @@ void gsc_async_sqlite_initialize();
 void gsc_async_sqlite_create_query();
 void gsc_async_sqlite_create_query_nosave();
 void gsc_async_sqlite_checkdone();
-
 void gsc_async_sqlite_create_entity_query(scr_entref_t entid);
 void gsc_async_sqlite_create_entity_query_nosave(scr_entref_t entid);
-
-void free_sqlite_db_stores_and_tasks();
 ////
+
+#endif
