@@ -1309,8 +1309,8 @@ void custom_SV_SendClientGameState(client_t *client)
     client->pureAuthentic = 0;
     client->gamestateMessageNum = client->netchan.outgoingSequence;
 
-    // Reset custom player state to default values
-    memset(&customPlayerState[clientNum], 0, sizeof(customPlayerState_t));
+    // Init custom player state
+    customPlayerState[clientNum] = {};
 
     // Restore user-provided rate and snaps after download
     SV_UserinfoChanged(client);
