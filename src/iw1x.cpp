@@ -1327,39 +1327,49 @@ void custom_SV_SendClientGameState(client_t *client)
         {
             MSG_WriteByte(&msg, svc_configstring);
             MSG_WriteShort(&msg, start);
-            std::string stringCopy(sv.configstrings[start]);
+            std::string csCopy(sv.configstrings[start]);
             if (start == 1)
             {
+                bool clientUsing1_1x = *Info_ValueForKey(client->userinfo, "xtndedbuild");
+
                 if (!sv_allowDownload->integer)
                 {
                     /*
                     If client has cl_allowDownload enabled, but sv_allowDownload is disabled, client will attempt to download anyway, and then fail joining.
-                    So if sv_allowDownload is disabled, force cl_allowDownload off.
+                    To fix this, if sv_allowDownload is disabled, write cl_allowDownload disabled on client, in case is enabled.
                     */
-                    stringCopy.append("\\cl_allowDownload\\0");
+                    csCopy.append("\\cl_allowDownload\\0");
                 }
                 else
                 {
                     if (sv_downloadForce->integer)
                     {
-                        /*
-                        To prevent servers forcing download on yourself, you can use the c1cx client extension
-                        See function CL_SystemInfoChanged_Cvar_Set in https://github.com/cod1dev/c1cx
-                        */
-                        stringCopy.append("\\cl_allowDownload\\1");
+                        csCopy.append("\\cl_allowDownload\\1");
                     }
                     else
                     {
                         /*
-                        1.1x client extension requires download forcing, even if player enables cl_allowDownload by himself before joining.
-                        See: https://github.com/xtnded/codextended-client/blob/45af251518a390ab08b1c8713a6a1544b70114a1/cl_main.cpp#L41
+                        1.1x mod requires download forcing, even if player enables cl_allowDownload by himself before joining.
+                        See https://github.com/xtnded/codextended-client/blob/45af251518a390ab08b1c8713a6a1544b70114a1/cl_main.cpp#L41
                         */
-                        if(*Info_ValueForKey(client->userinfo, "xtndedbuild"))
-                            stringCopy.append("\\cl_allowDownload\\1");
+                        if(clientUsing1_1x)
+                            csCopy.append("\\cl_allowDownload\\1");
                     }
                 }
+
+                if (clientUsing1_1x)
+                {
+                    /*
+                    1.1x bounce support
+                    See https://github.com/xtnded/codextended-client/blob/45af251518a390ab08b1c8713a6a1544b70114a1/cgame.cpp#L454
+                    */
+                    size_t pos = csCopy.find(jump_bounceEnable->name);
+                    if (pos != std::string::npos)
+                        csCopy.replace(pos, strlen(jump_bounceEnable->name), "x_cl_bounce");
+                }
             }
-            MSG_WriteBigString(&msg, stringCopy.c_str());
+
+            MSG_WriteBigString(&msg, csCopy.c_str());
         }
     }
     
@@ -1389,6 +1399,27 @@ void custom_SV_SendClientGameState(client_t *client)
     Com_DPrintf("Sending %i bytes in gamestate to client: %i\n", msg.cursize, clientNum);
 
     SV_SendMessageToClient(&msg, client);
+}
+
+void hook_SV_SetConfigstring_SV_SendServerCommand_cs(client_t *cl, int type, const char *fmt, ...)
+{
+    va_list argptr;
+    byte message[MAX_MSGLEN];
+    va_start(argptr, fmt);
+    vsprintf((char*)message, fmt, argptr);
+    va_end(argptr);
+
+    std::string command((char*)message);
+    
+    if (*Info_ValueForKey(cl->userinfo, "xtndedbuild"))
+    {
+        // 1.1x bounce support
+        size_t pos = command.find(jump_bounceEnable->name);
+        if (pos != std::string::npos)
+            command.replace(pos, strlen(jump_bounceEnable->name), "x_cl_bounce");
+    }
+    
+    return SV_SendServerCommand(cl, type, command.c_str());
 }
 
 scr_error_t scr_errors[MAX_ERROR_BUFFER];
@@ -3286,10 +3317,10 @@ void *custom_Sys_LoadDll(const char *name, char *fqpath, int (**entryPoint)(int,
     hook_PmoveSingle->hook();
 
     //// Jump height override
-    hook_jmp((int)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x88C, (int)hook_Jump_Check_Naked);
+    /*hook_jmp((int)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x88C, (int)hook_Jump_Check_Naked);
     resume_addr_Jump_Check = (uintptr_t)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x892;
     hook_jmp((int)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x899, (int)hook_Jump_Check_Naked_2);
-    resume_addr_Jump_Check_2 = (uintptr_t)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x8A4;
+    resume_addr_Jump_Check_2 = (uintptr_t)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x8A4;*/
     ////
 
 #if 0
@@ -3366,6 +3397,7 @@ class iw1x
         hook_call(0x0808c7b8, (int)hook_SV_DirectConnect);
         hook_call(0x0808c7ea, (int)hook_SV_AuthorizeIpPacket);
         hook_call(0x0808c74e, (int)hook_SVC_Info);
+        hook_call(0x08089db9, (int)hook_SV_SetConfigstring_SV_SendServerCommand_cs);
 
         hook_jmp(0x080717a4, (int)custom_FS_ReferencedPakChecksums);
         hook_jmp(0x080716cc, (int)custom_FS_ReferencedPakNames);
