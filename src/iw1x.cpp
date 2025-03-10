@@ -23,9 +23,11 @@ cvar_t *sv_rconPassword;
 cvar_t *sv_serverid;
 cvar_t *sv_showAverageBPS;
 cvar_t *sv_showCommands;
+
 // VM
 vmCvar_t *bg_fallDamageMaxHeight;
 vmCvar_t *bg_fallDamageMinHeight;
+
 // Custom
 cvar_t *airjump_heightScale;
 cvar_t *fs_callbacks;
@@ -63,6 +65,7 @@ level_locals_t *level;
 pmove_t **pm;
 pml_t *pml;
 stringIndex_t *scr_const;
+
 // Functions
 G_Say_t G_Say;
 G_RegisterCvars_t G_RegisterCvars;
@@ -147,6 +150,7 @@ callback_t callbacks[] =
     {&codecallback_playerdisconnect, "CodeCallback_PlayerDisconnect", false},
     {&codecallback_playerdamage, "CodeCallback_PlayerDamage", false},
     {&codecallback_playerkilled, "CodeCallback_PlayerKilled", false},
+    
     // Custom
     {&codecallback_client_spam, "CodeCallback_CLSpam", true},
     {&codecallback_playercommand, "CodeCallback_PlayerCommand", true},
@@ -262,12 +266,10 @@ qboolean FS_svrPak(const char *base)
     if (*fs_svrPaks->string)
     {
         bool isSvrPak = false;
-        size_t lenString = strlen(fs_svrPaks->string) + 1;
-        char* stringCopy = (char*)malloc(lenString);
-        strcpy(stringCopy, fs_svrPaks->string);
-
+        
+        std::string copy_fs_svrPaks(fs_svrPaks->string);
         const char* separator = ";";
-        char* strToken = strtok(stringCopy, separator);
+        char* strToken = strtok((char*)copy_fs_svrPaks.c_str(), separator);
 
         while (strToken != NULL)
         {
@@ -279,7 +281,6 @@ qboolean FS_svrPak(const char *base)
             strToken = strtok(NULL, separator);
         }
 
-        free(stringCopy);
         if(isSvrPak)
             return qtrue;
     }
@@ -345,9 +346,11 @@ void custom_Com_Init(char *commandLine)
     sv_showCommands = Cvar_FindVar("sv_showCommands");
 
     // Register
-    Cvar_Get("iw1x", "1", CVAR_SERVERINFO);
+    Cvar_Get("iw1x", "1", CVAR_SERVERINFO | CVAR_ROM);
+    Cvar_Get("iw1x_date", __DATE__, CVAR_SERVERINFO | CVAR_ROM);
     Cvar_Get("sv_wwwBaseURL", "", CVAR_ARCHIVE | CVAR_SYSTEMINFO);
     Cvar_Get("sv_wwwDownload", "0", CVAR_ARCHIVE | CVAR_SYSTEMINFO);
+
     // Register and create references
     airjump_heightScale = Cvar_Get("airjump_heightScale", "1.5", CVAR_ARCHIVE);
     fs_callbacks = Cvar_Get("fs_callbacks", "maps/mp/gametypes/_callbacksetup", CVAR_ARCHIVE);
@@ -556,14 +559,15 @@ void custom_SV_PacketEvent(netadr_t from, msg_t *msg)
                 if ((cl->reliableSequence - cl->reliableAcknowledge) > (MAX_RELIABLE_COMMANDS - 1) || cl->reliableAcknowledge < 0 || (cl->reliableSequence - cl->reliableAcknowledge) < 0)
                 {
                     Com_Printf("Out of range reliableAcknowledge message from %s - cl->reliableSequence is %i, reliableAcknowledge is %i\n",
-                    cl->name, cl->reliableSequence, cl->reliableAcknowledge);
+                        cl->name, cl->reliableSequence, cl->reliableAcknowledge
+                    );
+                    
                     cl->reliableAcknowledge = cl->reliableSequence;
                     return;
                 }
                 ////
                 
                 SV_Netchan_Decode(cl, msg->data + msg->readcount, msg->cursize - msg->readcount);
-
                 if(cl->state == CS_ZOMBIE)
                     return;
 
@@ -572,6 +576,7 @@ void custom_SV_PacketEvent(netadr_t from, msg_t *msg)
                 return;
             }
         }
+
         NET_OutOfBandPrint(NS_SERVER, from, "disconnect");
         unknown_var = 0;
         Hunk_ClearTempMemoryInternal();
@@ -591,16 +596,16 @@ int custom_SV_CanReplaceServerCommand(client_t *client, const char *command)
 ////
 /*
 Purpose:
-Prevent server from no longer appearing in client list after masterserver spent time unreachable.
+Prevent server from no longer appearing in client list after masterserver spent some time unreachable.
 Using the sv_heartbeatDelay cvar which has a default value lower than HEARTBEAT_MSEC.
 See:
 - https://github.com/xtnded/codextended/blob/f7b28c8b8ee4cfb03f8d46d6e1df2efe0380cc1b/src/sv_main.c#L337
 - https://github.com/id-Software/Enemy-Territory/blob/40342a9e3690cb5b627a433d4d5cbf30e3c57698/src/server/sv_main.c#L244
 - https://github.com/voron00/CoD2rev_Server/blob/b012c4b45a25f7f80dc3f9044fe9ead6463cb5c6/src/libcod/libcod.cpp#L505
 - https://github.com/voron00/CoD2rev_Server/blob/b012c4b45a25f7f80dc3f9044fe9ead6463cb5c6/src/server/sv_main_pc_mp.cpp#L216
+
 // UNTESTED
-*/
-/*
+
 TODO: Check if issue wasn't caused by not ignoring SV_AuthorizeIpPacket
 See https://github.com/xtnded/codextended/blob/f7b28c8b8ee4cfb03f8d46d6e1df2efe0380cc1b/src/sv_client.c#L234
 */
@@ -637,9 +642,12 @@ void custom_SV_MasterHeartbeat(const char *hbname)
 
                 if(!strstr(":", sv_master[i]->string))
                     adr[i].port = BigShort(PORT_MASTER);
-                Com_Printf("%s resolved to %i.%i.%i.%i:%i\n", sv_master[i]->string,
-                adr[i].ip[0], adr[i].ip[1], adr[i].ip[2], adr[i].ip[3],
-                BigShort(adr[i].port));
+
+                Com_Printf("%s resolved to %i.%i.%i.%i:%i\n",
+                    sv_master[i]->string,
+                    adr[i].ip[0], adr[i].ip[1], adr[i].ip[2], adr[i].ip[3],
+                    BigShort(adr[i].port)
+                );
             }
 
             Com_Printf("Sending heartbeat to %s\n", sv_master[i]->string);
@@ -771,7 +779,6 @@ bool SVC_callback(const char *str, const char *ip)
         Scr_AddString(str);
         short ret = Scr_ExecThread(codecallback_client_spam, 2);
         Scr_FreeThread(ret);
-
         return true;
     }
     return false;
@@ -837,6 +844,7 @@ void SV_AuthorizeRequest(netadr_t from, int challenge)
         Q_strncpyz(gameDir, fs_game->string, sizeof(gameDir));
 
     Com_DPrintf("sending getIpAuthorize for %s\n", NET_AdrToString(from));
+    
     NET_OutOfBandPrint(NS_SERVER, svs.authorizeAddress,
         va("getIpAuthorize %i %i.%i.%i.%i %s %i",
             challenge,
@@ -845,7 +853,9 @@ void SV_AuthorizeRequest(netadr_t from, int challenge)
             from.ip[2],
             from.ip[3],
             gameDir,
-            sv_allowAnonymous->integer));
+            sv_allowAnonymous->integer
+        )
+    );
 }
 void custom_SV_GetChallenge(netadr_t from)
 {
@@ -925,7 +935,8 @@ void custom_SV_GetChallenge(netadr_t from)
                     svs.authorizeAddress.ip[1],
                     svs.authorizeAddress.ip[2],
                     svs.authorizeAddress.ip[3],
-                    BigShort(svs.authorizeAddress.port));
+                    BigShort(svs.authorizeAddress.port)
+                );
     }
     
     if ((AUTHORIZE_TIMEOUT < svs.time - svs.sv_lastTimeMasterServerCommunicated) && (AUTHORIZE_TIMEOUT < svs.time - challenge->firstTime))
@@ -962,13 +973,13 @@ void hook_SV_DirectConnect(netadr_t from)
     bool unbanned;
     char* userinfo;
     char ip[16];
-    std::ostringstream oss;
+    std::stringstream ss;
     std::string argBackup;
     
     unbanned = false;
     userinfo = Cmd_Argv(1);
-    oss << "connect \"" << userinfo << "\"";
-    argBackup = oss.str();
+    ss << "connect \"" << userinfo << "\"";
+    argBackup = ss.str();
     snprintf(ip, sizeof(ip), "%d.%d.%d.%d", from.ip[0], from.ip[1], from.ip[2], from.ip[3]);
 
     auto banInfo = getBanInfoForIp(ip);
@@ -993,39 +1004,39 @@ void hook_SV_DirectConnect(netadr_t from)
                 int minutes = (remaining_seconds % (60 * 60)) / 60;
                 int seconds = remaining_seconds % 60;
 
-                oss.str(std::string());
-                oss.clear();
+                ss.str(std::string());
+                ss.clear();
 
                 if (days > 0)
                 {
-                    oss << days << " day" << (days > 1 ? "s" : "");
+                    ss << days << " day" << (days > 1 ? "s" : "");
                     if(hours > 0)
-                        oss << ", " << hours << " hour" << (hours > 1 ? "s" : "");
+                    ss << ", " << hours << " hour" << (hours > 1 ? "s" : "");
                 }
                 else if (hours > 0)
                 {
-                    oss << hours << " hour" << (hours > 1 ? "s" : "");
+                    ss << hours << " hour" << (hours > 1 ? "s" : "");
                     if(minutes > 0)
-                        oss << ", " << minutes << " minute" << (minutes > 1 ? "s" : "");
+                    ss << ", " << minutes << " minute" << (minutes > 1 ? "s" : "");
                 }
                 else if(minutes > 0)
-                    oss << minutes << " minute" << (minutes > 1 ? "s" : "");
+                    ss << minutes << " minute" << (minutes > 1 ? "s" : "");
                 else
-                    oss << seconds << " second" << (seconds > 1 ? "s" : "");
+                    ss << seconds << " second" << (seconds > 1 ? "s" : "");
 
-                remainingTime = oss.str();
+                remainingTime = ss.str();
             }
         }
 
         if (!unbanned)
         {
             std::string banInfoMessage = "error\nBanned IP";
-            if(std::get<3>(banInfo) != "none")
+            if (std::get<3>(banInfo) != "none")
             {
                 banInfoMessage.append(" - Reason: ");
                 banInfoMessage.append(std::get<3>(banInfo));
             }
-            if(!remainingTime.empty())
+            if (!remainingTime.empty())
             {
                 banInfoMessage.append(" - Remaining: ");
                 banInfoMessage.append(remainingTime);
@@ -1309,7 +1320,7 @@ void custom_SV_SendClientGameState(client_t *client)
     client->pureAuthentic = 0;
     client->gamestateMessageNum = client->netchan.outgoingSequence;
 
-    // Init custom player state
+    // Init/reset custom player state
     customPlayerState[clientNum] = {};
 
     // Restore user-provided rate and snaps after download
@@ -1373,6 +1384,7 @@ void custom_SV_SendClientGameState(client_t *client)
         }
     }
     
+    // TODO: clean
     memset(&nullstate, 0, sizeof(nullstate));
     int *base = (int*)(0x08357680);
     for (start = 0; start < MAX_GENTITIES; start++)
@@ -1533,7 +1545,7 @@ static void ban()
     if (Cmd_Argc() < 3)
     {
         Com_Printf("Usage: ban (-i <IP address> | -n <client number>) [-r reason] [-d duration]\n");
-        Com_Printf("Notes: Use \"h\" for hours or \"d\" for days\n");
+        Com_Printf("Notes: Use h for hours or d for days\n");
         return;
     }
 
@@ -1623,7 +1635,7 @@ static void ban()
     if (parsedParameters.find("-n") != parsedParameters.end())
     {
         // Check if specified both an IP and a client number
-        if(parsedParameters.find("-i") != parsedParameters.end())
+        if (parsedParameters.find("-i") != parsedParameters.end())
         {
             infoMessage = "Don't use both an IP and a client number";
             sendMessageToClient_orServerConsole(clAdmin, infoMessage);
@@ -1637,7 +1649,7 @@ static void ban()
     if (ipParam != parsedParameters.end())
     {
         struct sockaddr_in sa;
-        if(!inet_pton(AF_INET, ipParam->second.c_str(), &(sa.sin_addr)))
+        if (!inet_pton(AF_INET, ipParam->second.c_str(), &(sa.sin_addr)))
         {
             infoMessage = "Invalid IP address " + ipParam->second;
             sendMessageToClient_orServerConsole(clAdmin, infoMessage);
@@ -1647,7 +1659,7 @@ static void ban()
         std::strcpy(ip, ipParam->second.c_str());
     }
 
-    if(!useClientnum && !useIp)
+    if (!useClientnum && !useIp)
     {
         infoMessage = "Use an IP or a client number";
         sendMessageToClient_orServerConsole(clAdmin, infoMessage);
@@ -1736,7 +1748,7 @@ static void ban()
     if (useClientnum)
     {
         clToBan = &svs.clients[std::stoi(parsedParameters.find("-n")->second)];
-        if(!clToBan)
+        if (!clToBan)
         {
             infoMessage = "Couldn't find player by num " + parsedParameters.find("-n")->second;
             sendMessageToClient_orServerConsole(clAdmin, infoMessage);
@@ -1744,7 +1756,12 @@ static void ban()
         }
         else
         {
-            snprintf(ip, sizeof(ip), "%d.%d.%d.%d", clToBan->netchan.remoteAddress.ip[0], clToBan->netchan.remoteAddress.ip[1], clToBan->netchan.remoteAddress.ip[2], clToBan->netchan.remoteAddress.ip[3]);
+            snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
+                clToBan->netchan.remoteAddress.ip[0],
+                clToBan->netchan.remoteAddress.ip[1],
+                clToBan->netchan.remoteAddress.ip[2],
+                clToBan->netchan.remoteAddress.ip[3]
+            );
         }
     }
     else if (useIp)
@@ -1756,7 +1773,13 @@ static void ban()
             if (clCheck->state > CS_CONNECTED)
             {
                 char ip_check[16];
-                snprintf(ip_check, sizeof(ip_check), "%d.%d.%d.%d", clCheck->netchan.remoteAddress.ip[0], clCheck->netchan.remoteAddress.ip[1], clCheck->netchan.remoteAddress.ip[2], clCheck->netchan.remoteAddress.ip[3]);
+                snprintf(ip_check, sizeof(ip_check), "%d.%d.%d.%d",
+                    clCheck->netchan.remoteAddress.ip[0],
+                    clCheck->netchan.remoteAddress.ip[1],
+                    clCheck->netchan.remoteAddress.ip[2],
+                    clCheck->netchan.remoteAddress.ip[3]
+                );
+                
                 if (!strcmp(ip_check, ip))
                 {
                     clToBan = clCheck;
@@ -1954,9 +1977,9 @@ static void unban()
     }
     else
     {
-        std::ostringstream oss;
-        oss << "IP " << ip << " not found";
-        infoMessage = oss.str();
+        std::stringstream ss;
+        ss << "IP " << ip << " not found";
+        infoMessage = ss.str();
         sendMessageToClient_orServerConsole(clAdmin, infoMessage);
     }
 }
@@ -2077,7 +2100,6 @@ void custom_SV_BeginDownload_f(client_t *cl)
 {
     //// [exploit patch] q3dirtrav
     /* See:
-    - https://aluigi.altervista.org/video/q3dirtrav.avi
     - https://aluigi.altervista.org/poc/q3dirtrav.zip
     - https://oldforum.aluigi.org/post3479.html#p3479
     */
@@ -2093,7 +2115,7 @@ void custom_SV_BeginDownload_f(client_t *cl)
                 cl->netchan.remoteAddress.ip[1],
                 cl->netchan.remoteAddress.ip[2],
                 cl->netchan.remoteAddress.ip[3]);
-            Com_Printf("WARNING: %s (%s) tried to download %s.\n", cl->name, ip, arg1);
+            Com_Printf("WARNING: %s (%s) tried to download %s\n", cl->name, ip, arg1);
             return;
         }
     }
@@ -2223,9 +2245,11 @@ void custom_SV_WriteDownloadToClient(client_t *cl, msg_t *msg)
 
     MSG_WriteByte(msg, svc_download);
     MSG_WriteShort(msg, cl->downloadXmitBlock);
+
     // Block zero contains file size
     if(cl->downloadXmitBlock == 0)
         MSG_WriteLong(msg, cl->downloadSize);
+
     MSG_WriteShort(msg, cl->downloadBlockSize[curindex]);
 
     // Write the block
@@ -2241,7 +2265,7 @@ void custom_SV_WriteDownloadToClient(client_t *cl, msg_t *msg)
 }
 
 // See https://github.com/voron00/CoD2rev_Server/blob/b012c4b45a25f7f80dc3f9044fe9ead6463cb5c6/src/server/sv_snapshot_mp.cpp#L686
-// TODO: Figure out why receiving client_t* was causing issue.
+// FIXME: receiving as client_t* makes download slow
 static int SV_RateMsec(client_t client, int messageSize)
 {
     int rate;
@@ -2504,7 +2528,6 @@ void hook_ClientCommand(int clientNum)
 
 //// 1.1 deadchat support
 // See https://github.com/xtnded/codextended/blob/855df4fb01d20f19091d18d46980b5fdfa95a712/src/sv_client.c#L940
-// TODO: Like stock support from above versions.
 void hook_G_Say(gentity_s *ent, gentity_s *target, int mode, const char *chatText)
 {
     int unknown_var = *(int*)((int)ent->client + 8400);
@@ -2656,7 +2679,7 @@ void PM_ProjectVelocity(const float *velIn, const float *normal, float *velOut)
     }
 }
 
-void hook_PM_ClipVelocity_bounce(const float *in, const float *normal, float *out, float overbounce)
+void hook_PM_StepSlideMove_PM_ClipVelocity(const float *in, const float *normal, float *out, float overbounce)
 {
     if(jump_bounceEnable->integer)
         PM_ProjectVelocity(in, normal, out);
@@ -3061,11 +3084,6 @@ void custom_Touch_Item_Auto(gentity_t *item, gentity_t *entity, int touch)
     hook_Touch_Item_Auto->hook();
 }
 
-/*
-Fix the scoreboard showing the ping of players as being the ping of their spectators.
-The cause of the issue is that CoD1.1 sends cl->ps.ping instead of cl->ping.
-This is based on the CoD2 function.
-*/
 void custom_DeathmatchScoreboardMessage(gentity_t *ent)
 {
     int ping;
@@ -3109,6 +3127,10 @@ void custom_DeathmatchScoreboardMessage(gentity_t *ent)
         }
         else
         {
+            /*
+            Send cl->ping instead of cl->ps.ping,
+            to fix the scoreboard showing the ping of the player your are spectating as being your own ping.
+            */
             ping = svs.clients[clientNum].ping;
 
             Com_sprintf(
@@ -3141,8 +3163,8 @@ void UCMD_custom_sprint(client_t *cl)
     if (!player_sprint->integer)
     {
         std::string message = "e \"";
-        message.append("Sprint is not enabled on this server.");
-        message.append("\"");
+        message += "Sprint is not enabled on this server.";
+        message += "\"";
         SV_SendServerCommand(cl, SV_CMD_CAN_IGNORE, message.c_str());
         return;
     }
@@ -3155,15 +3177,28 @@ void UCMD_custom_sprint(client_t *cl)
         customPlayerState[clientNum].sprintRequestPending = true;
 }
 
-void ServerCrash(int sig)
+void CrashLogger(int sig)
 {
     int fd;
     FILE *fp;
     void *array[20];
     size_t size = backtrace(array, 20);
+    
+    std::filesystem::path fs_lnxded_path;
+    char lnxded_path[PATH_MAX];
+    ssize_t len = readlink("/proc/self/exe", lnxded_path, sizeof(lnxded_path) - 1);
+    if (len == -1)
+    {
+        printf("Failed writing to crash log\n");
+        system("stty sane");
+        exit(1);
+    }
+    lnxded_path[len] = '\0';
+    fs_lnxded_path = lnxded_path;
+    fs_lnxded_path.replace_filename("iw1x_crash.log");
 
     // Write to crash log
-    fp = fopen("./crash.log", "a");
+    fp = fopen(fs_lnxded_path.c_str(), "a");
     if (fp)
     {
         fd = fileno(fp);
@@ -3339,7 +3374,7 @@ void *custom_Sys_LoadDll(const char *name, char *fqpath, int (**entryPoint)(int,
     
     hook_call((int)dlsym(libHandle, "vmMain") + 0xB0, (int)hook_ClientCommand);
     hook_call((int)dlsym(libHandle, "ClientEndFrame") + 0x311, (int)hook_StuckInClient);
-    hook_call((int)dlsym(libHandle, "_init") + 0xDF22, (int)hook_PM_ClipVelocity_bounce);
+    hook_call((int)dlsym(libHandle, "_init") + 0xDF22, (int)hook_PM_StepSlideMove_PM_ClipVelocity);
 
     hook_jmp((int)dlsym(libHandle, "G_LocalizedStringIndex"), (int)custom_G_LocalizedStringIndex);
     hook_jmp((int)dlsym(libHandle, "va"), (int)custom_va);
@@ -3367,15 +3402,15 @@ class iw1x
     public:
     iw1x()
     {
-        printf("------------ iw1x ------------\n");
-        printf("Compiled on %s %s using g++ %s\n", __DATE__, __TIME__, __VERSION__);
+        printf("-------- iw1x --------\n");
+        printf("Compiled on %s %s using g++ %s and glibc %i.%i\n", __DATE__, __TIME__, __VERSION__, __GLIBC__, __GLIBC_MINOR__);
 
         // Don't inherit lib of parent
         unsetenv("LD_PRELOAD");
 
         // Crash handlers for debugging
-        signal(SIGSEGV, ServerCrash);
-        signal(SIGABRT, ServerCrash);
+        signal(SIGSEGV, CrashLogger);
+        signal(SIGABRT, CrashLogger);
         
         // Otherwise the printf()'s are printed at crash/end on older os/compiler versions
         // See https://github.com/M-itch/libcod/blob/e58d6a01b11c911fbf886659b6ea67795776cf4a/libcod.cpp#L1346
@@ -3383,6 +3418,11 @@ class iw1x
 
         // Allow to write in executable memory
         mprotect((void *)0x08048000, 0x135000, PROT_READ | PROT_WRITE | PROT_EXEC);
+
+#if 0
+        // Crash test
+        * (int*)nullptr = 1;
+#endif
 
         // [exploit patch] q3infoboom
         /* See:
@@ -3428,13 +3468,12 @@ class iw1x
         hook_SV_BotUserMove = new cHook(0x0808cccc, (int)custom_SV_BotUserMove);
         hook_SV_BotUserMove->hook();
 
-        printf("Loading complete\n");
-        printf("--------------------------------\n");
+        printf("----------------------\n");
     }
 
     ~iw1x()
     {
-        printf("iw1x unloaded\n");
+        printf("iw1x destructor called\n");
         system("stty sane");
     }
 };

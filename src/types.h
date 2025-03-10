@@ -47,13 +47,13 @@
 #define MAX_HUDELEMS_CURRENT        MAX_HUDELEMENTS
 #define MAX_CVAR_VALUE_STRING       256
 
-#define CVAR_NOFLAG             0               // 0
-#define CVAR_ARCHIVE            (1 << 0)        // 1
-#define CVAR_SERVERINFO         (1 << 2)        // 4
-#define CVAR_SYSTEMINFO         (1 << 3)        // 8
-#define CVAR_INIT               (1 << 4)        // 16
-#define CVAR_LATCH              (1 << 5)        // 32
-#define CVAR_CHEAT              (1 << 9)        // 512
+#define CVAR_ARCHIVE        1
+#define CVAR_SERVERINFO     4
+#define CVAR_SYSTEMINFO     8
+#define CVAR_INIT           16
+#define CVAR_LATCH          32
+#define CVAR_ROM            64
+#define CVAR_CHEAT          512
 
 #define SVF_SINGLECLIENT 0x800
 
