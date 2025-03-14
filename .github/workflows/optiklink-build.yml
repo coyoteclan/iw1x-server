@@ -73,7 +73,7 @@ jobs:
           apt-get update
 
           # Required for building
-          apt-get install -y g++-multilib cmake libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 meson ninja
+          apt-get install -y g++-multilib cmake libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386 meson
 
       - name: Configure Build
         run: |
