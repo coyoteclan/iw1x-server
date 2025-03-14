@@ -55,6 +55,7 @@ cvar_t *player_sprint;
 cvar_t *player_sprintMinTime;
 cvar_t *player_sprintSpeedScale;
 cvar_t *player_sprintTime;
+cvar_t *ol_fsgame;
 ////
 
 //// Game lib
@@ -317,6 +318,10 @@ void custom_Com_Init(char *commandLine)
     hook_Com_Init->hook();
 
     //// Cvars
+    // fs_game workaround for optiklink
+    ol_fsgame = Cvar_FindVar("ol_fsgame");
+    if(*fs_game->string)
+        fs_game = Cvar_Set("fs_game", ol_fsgame->string);
     // Create references
     com_cl_running = Cvar_FindVar("cl_running");
     com_dedicated = Cvar_FindVar("dedicated");
