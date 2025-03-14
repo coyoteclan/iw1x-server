@@ -73,19 +73,8 @@ else()
     add_definitions(-DCOMPILE_SSL=0)
 endif()
 
-# Precompile Headers
-set(PCH_HEADER ${CMAKE_SOURCE_DIR}/src/pch.h)
-set(PCH_OUTPUT ${CMAKE_BINARY_DIR}/pch.h.gch)
-add_custom_command(
-    OUTPUT ${PCH_OUTPUT}
-    COMMAND ${CMAKE_CXX_COMPILER} -x c++-header ${PCH_HEADER} -o ${PCH_OUTPUT}
-    DEPENDS ${PCH_HEADER}
-)
-add_custom_target(precompile_headers DEPENDS ${PCH_OUTPUT})
-
 # Source files
 set(SOURCES
-    ${CMAKE_SOURCE_DIR}/src/pch.h
     ${CMAKE_SOURCE_DIR}/src/hook.cpp
     ${CMAKE_SOURCE_DIR}/src/iw1x.cpp
     ${CMAKE_SOURCE_DIR}/src/gsc.cpp
@@ -107,7 +96,6 @@ if(CURL_FOUND)
 endif()
 
 add_library(iw1x SHARED ${SOURCES})
-add_dependencies(iw1x precompile_headers)
 
 # Output properties
 set_target_properties(iw1x PROPERTIES
