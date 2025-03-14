@@ -75,6 +75,7 @@ endif()
 
 # Source files
 set(SOURCES
+    ${CMAKE_SOURCE_DIR}/src/pch.h
     ${CMAKE_SOURCE_DIR}/src/hook.cpp
     ${CMAKE_SOURCE_DIR}/src/iw1x.cpp
     ${CMAKE_SOURCE_DIR}/src/gsc.cpp
@@ -96,7 +97,7 @@ if(CURL_FOUND)
 endif()
 
 add_library(iw1x SHARED ${SOURCES})
-target_precompile_headers(iw1x PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
+# target_precompile_headers(iw1x PRIVATE ${CMAKE_SOURCE_DIR}/src/pch.h)
 
 # Output properties
 set_target_properties(iw1x PROPERTIES
