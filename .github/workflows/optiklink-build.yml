@@ -78,7 +78,7 @@ jobs:
       - name: Configure Build
         run: |
           mkdir -p build
-          cd build
+          #cd build
           meson configure build -Dcompile_ssl=true -Dcompile_sqlite=true -Denable_unsafe=true -Dcompile_curl=true
           #cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL
 
