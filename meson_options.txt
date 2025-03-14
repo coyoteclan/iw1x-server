@@ -1,0 +1,10 @@
+option('debug_build', type : 'boolean', value : false,
+  description : 'Include debug info, no optimization')
+option('enable_unsafe', type : 'boolean', value : false,
+  description : 'Enable risky features (fread, fwrite, etc.)')
+option('compile_ssl', type : 'boolean', value : false,
+  description : 'Enable SSL support')
+option('compile_curl', type : 'boolean', value : false,
+  description : 'Enable cURL support')
+option('compile_sqlite', type : 'boolean', value : false,
+  description : 'Enable SQLite support')
