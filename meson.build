@@ -86,9 +86,7 @@ lib = shared_library(
   dependencies : deps,
   link_args : ['-ldl'],
   name_prefix : '',  # Remove the default "lib" prefix.
-  install : false   # Change to true if you want to install.
+  install_dir : join_paths(meson.current_source_dir(), 'bin'),
+  install : true   # Change to true if you want to install.
 )
 
-# (Optional) Install the built shared library to a specific directory.
-# Meson does not directly control the build directory layout, but you can specify an installation directory.
-install_shared_library(lib, install_dir : join_paths(meson.current_source_dir(), 'bin'))
