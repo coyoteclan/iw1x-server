@@ -78,7 +78,7 @@ set(PCH_HEADER ${CMAKE_SOURCE_DIR}/src/pch.h)
 set(PCH_OUTPUT ${CMAKE_BINARY_DIR}/pch.h.gch)
 add_custom_command(
     OUTPUT ${PCH_OUTPUT}
-    COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} -x c++-header ${PCH_HEADER} -o ${PCH_OUTPUT}
+    COMMAND ${CMAKE_CXX_COMPILER} -x c++-header ${PCH_HEADER} -o ${PCH_OUTPUT}
     DEPENDS ${PCH_HEADER}
 )
 add_custom_target(precompile_headers DEPENDS ${PCH_OUTPUT})
