@@ -79,7 +79,7 @@ jobs:
         run: |
           mkdir -p build
           #cd build
-          meson setup build -Denable_unsafe=true -Dcompile_curl=true
+          meson setup build -Denable_unsafe=true -Dcompile_curl=false
           #cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL
 
       - name: Build
