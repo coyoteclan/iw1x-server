@@ -1,0 +1,91 @@
+name: Default Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debugging information, disable optimization'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      unsafe:
+        description: 'Enable unsafe features (fread, fwrite...)'
+        required: true
+        default: 'ON'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      sqlite:
+        description: 'SQLite support'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      curl:
+        description: 'cURL support'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      ssl:
+        description: 'SSL support (hash)'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BDEBUG: ${{ inputs.debug || 'OFF' }}
+      BUNSAFE: ${{ inputs.unsafe || 'ON' }}
+      BSQLITE: ${{ inputs.sqlite || 'OFF' }}
+      BCURL: ${{ inputs.curl || 'OFF' }}
+      BSSL: ${{ inputs.ssl || 'OFF' }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          # Add i386 architecture so that 32-bit packages can be installed
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+
+          # Required for building
+          sudo apt-get install -y g++-multilib cmake libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
+
+      - name: Configure Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL
+
+      - name: Build Debug
+        run: |
+          cd build
+          make
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iw1x library
+          path: bin/iw1x.so
