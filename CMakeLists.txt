@@ -18,6 +18,7 @@ option(ENABLE_UNSAFE "Enable risky features (fread, fwrite...)" OFF)
 option(COMPILE_SSL "SSL support" OFF)
 option(COMPILE_CURL "cURL support" OFF)
 option(COMPILE_SQLITE "SQLite support" OFF)
+option(AIRJUMPS "Enable Air jumps" OFF)
 
 message(STATUS "${SEPARATOR}")
 message(STATUS "Debug: ${DEBUG_BUILD}")
@@ -25,6 +26,7 @@ message(STATUS "Risky features: ${ENABLE_UNSAFE}")
 message(STATUS "SSL: ${COMPILE_SSL}")
 message(STATUS "cURL: ${COMPILE_CURL}")
 message(STATUS "SQLite: ${COMPILE_SQLITE}")
+message(STATUS "AIRJUMPS: ${AIRJUMPS}")
 message(STATUS "${SEPARATOR}")
 
 # -g:       Include debug info
@@ -71,6 +73,12 @@ if(COMPILE_SSL)
     find_package(OpenSSL REQUIRED)
 else()
     add_definitions(-DCOMPILE_SSL=0)
+endif()
+
+if(AIRJUMPS)
+    add_definitions(-DAIRJUMPS=1)
+else()
+    add_definitions(-DAIRJUMPS=0)
 endif()
 
 # Source files
