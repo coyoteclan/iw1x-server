@@ -1,4 +1,4 @@
-name: Default Build
+name: Build
 
 on:
   workflow_dispatch:
@@ -43,6 +43,14 @@ on:
         options:
         - 'ON'
         - 'OFF'
+      airjumps:
+        description: 'Enable Air jumps'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
   push:
     branches: [ main ]
   pull_request:
@@ -52,6 +60,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+        image: quay.io/mechamorph/iw1x-debian-bookworm
 
     env:
       BDEBUG: ${{ inputs.debug || 'OFF' }}
@@ -59,27 +69,28 @@ jobs:
       BSQLITE: ${{ inputs.sqlite || 'OFF' }}
       BCURL: ${{ inputs.curl || 'OFF' }}
       BSSL: ${{ inputs.ssl || 'OFF' }}
+      AIRJUMPS: ${{ inputs.airjumps || 'OFF' }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: |
-          # Add i386 architecture so that 32-bit packages can be installed
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
+      #- name: Install Dependencies
+      #  run: |
+      #    # Add i386 architecture so that 32-bit packages can be installed
+      #    #dpkg --add-architecture i386
+      #    #apt-get update
 
-          # Required for building
-          sudo apt-get install -y g++-multilib cmake libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
+      #    # Required for building
+      #    #apt-get install -y g++-multilib cmake libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
 
       - name: Configure Build
         run: |
           mkdir -p build
           cd build
-          cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL
+          cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL -DAIRJUMPS=$AIRJUMPS
 
-      - name: Build Debug
+      - name: Build
         run: |
           cd build
           make
@@ -88,4 +99,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: iw1x library
-          path: bin/iw1x.so
+          path: bin/libcod1.so

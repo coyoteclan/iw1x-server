@@ -186,6 +186,7 @@ cHook *hook_Com_Init;
 cHook *hook_DeathmatchScoreboardMessage;
 cHook *hook_GScr_LoadGameTypeScript;
 cHook *hook_PM_AirMove;
+cHook *hook_PM_CrashLand;
 cHook *hook_PM_FlyMove;
 cHook *hook_PmoveSingle;
 cHook *hook_SV_AddOperatorCommands;
@@ -348,6 +349,7 @@ void custom_Com_Init(char *commandLine)
     // Register
     Cvar_Get("iw1x", "1", CVAR_SERVERINFO | CVAR_ROM);
     Cvar_Get("iw1x_date", __DATE__, CVAR_SERVERINFO | CVAR_ROM);
+    Cvar_Get("iw1x_version", "Kazam's fork", CVAR_SERVERINFO | CVAR_ROM);
     Cvar_Get("sv_wwwBaseURL", "", CVAR_ARCHIVE | CVAR_SYSTEMINFO);
     Cvar_Get("sv_wwwDownload", "0", CVAR_ARCHIVE | CVAR_SYSTEMINFO);
 
@@ -2731,10 +2733,11 @@ int PM_ClampFallDamage(int val, int min, int max)
     x = PM_ClampFallDamageMax(val - max, max, val);
     return PM_ClampFallDamageMax(min - val, min, x);
 }
+#endif
 void custom_PM_CrashLand()
 {
-    printf("##### custom_PM_CrashLand\n")
-
+    //Com_DPrintf("##### custom_PM_CrashLand\n");
+#if 0
     int dmg;
     int hardDmg;
     int lightDmg;
@@ -2901,24 +2904,31 @@ void custom_PM_CrashLand()
             }
         }
     }
+#endif
     
 
-
-    /*int clientNum = (*pm)->ps->clientNum;
+#if AIRJUMPS
+    int clientNum = (*pm)->ps->clientNum;
     if (customPlayerState[clientNum].overrideJumpHeight_air)
     {
         // Player landed an airjump, disable overrideJumpHeight_air
         customPlayerState[clientNum].overrideJumpHeight_air = false;
     }
+#endif
+
+    hook_PM_CrashLand->unhook();
+    void (*PM_CrashLand)();
+    *(int*)&PM_CrashLand = hook_PM_CrashLand->from;
+    PM_CrashLand();
+    hook_PM_CrashLand->hook();
     
-    if (codecallback_playercrashland)
+    /*if (codecallback_playercrashland)
     {
         gentity_t *gentity = &g_entities[(*pm)->ps->clientNum];
         short ret = Scr_ExecEntThread(gentity, codecallback_playercrashland, 0);
         Scr_FreeThread(ret);
     }*/
 }
-#endif
 ////
 
 
@@ -3352,17 +3362,18 @@ void *custom_Sys_LoadDll(const char *name, char *fqpath, int (**entryPoint)(int,
     hook_PmoveSingle->hook();
 
     //// Jump height override
-    /*hook_jmp((int)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x88C, (int)hook_Jump_Check_Naked);
+    hook_jmp((int)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x88C, (int)hook_Jump_Check_Naked);
     resume_addr_Jump_Check = (uintptr_t)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x892;
     hook_jmp((int)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x899, (int)hook_Jump_Check_Naked_2);
-    resume_addr_Jump_Check_2 = (uintptr_t)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x8A4;*/
+    resume_addr_Jump_Check_2 = (uintptr_t)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x8A4;
     ////
 
 #if 0
     hook_jmp((int)dlsym(libHandle, "_init") + 0x88C4, (int)custom_PM_CrashLand);
 #endif
     // FIXME: Something below causes (stock) bounce smoothness issue
-    /*//// Air jumping
+    //// Air jumping
+#if AIRJUMPS
     hook_PM_AirMove = new cHook((int)dlsym(libHandle, "_init") + 0x7B98, (int)custom_PM_AirMove);
     hook_PM_AirMove->hook();
     hook_PM_CrashLand = new cHook((int)dlsym(libHandle, "_init") + 0x88C4, (int)custom_PM_CrashLand);
@@ -3371,7 +3382,8 @@ void *custom_Sys_LoadDll(const char *name, char *fqpath, int (**entryPoint)(int,
     int addr_Jump_Check_JLE = (int)dlsym(libHandle, "BG_PlayerTouchesItem") + 0x7FD; // if (pm->cmd.serverTime - pm->ps->jumpTime <= 499)
     hook_nop(addr_Jump_Check_JLE, addr_Jump_Check_JLE + 2);
     ////*/
-    
+#endif
+
     hook_call((int)dlsym(libHandle, "vmMain") + 0xB0, (int)hook_ClientCommand);
     hook_call((int)dlsym(libHandle, "ClientEndFrame") + 0x311, (int)hook_StuckInClient);
     hook_call((int)dlsym(libHandle, "_init") + 0xDF22, (int)hook_PM_StepSlideMove_PM_ClipVelocity);

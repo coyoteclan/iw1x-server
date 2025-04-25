@@ -1,0 +1,158 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debugging information, disable optimization'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      unsafe:
+        description: 'Enable unsafe features (fread, fwrite...)'
+        required: true
+        default: 'ON'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      sqlite:
+        description: 'SQLite support'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      curl:
+        description: 'cURL support'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      ssl:
+        description: 'SSL support (hash)'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+      airjumps:
+        description: 'Enable Air jumps'
+        required: true
+        default: 'OFF'
+        type: choice
+        options:
+        - 'ON'
+        - 'OFF'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+        image: quay.io/mechamorph/iw1x-debian-bookworm
+
+    env:
+      BDEBUG: ${{ inputs.debug || 'OFF' }}
+      BUNSAFE: ${{ inputs.unsafe || 'ON' }}
+      BSQLITE: ${{ inputs.sqlite || 'OFF' }}
+      BCURL: ${{ inputs.curl || 'OFF' }}
+      BSSL: ${{ inputs.ssl || 'OFF' }}
+      AIRJUMPS: ${{ inputs.airjumps || 'OFF' }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      #- name: Install Dependencies
+      #  run: |
+      #    # Add i386 architecture so that 32-bit packages can be installed
+      #    dpkg --add-architecture i386
+      #    
+      #    apt-get update
+
+      #    # Required for building
+      #    apt-get install -y g++-multilib cmake libsqlite3-dev:i386 libcurl4-openssl-dev:i386 libssl-dev:i386
+
+      - name: Configure Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DDEBUG_BUILD=$BDEBUG -DENABLE_UNSAFE=$BUNSAFE -DCOMPILE_SQLITE=$BSQLITE -DCOMPILE_CURL=$BCURL -DCOMPILE_SSL=$BSSL -DAIRJUMPS=$AIRJUMPS
+
+      - name: Build
+        run: |
+          cd build
+          make
+
+      - name: Get Current Date and Time
+        id: get_datetime
+        run: echo "datetime=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_ENV
+
+      - name: Generate Tag Name
+        id: generate_tag
+        run: echo "tag_name=release-$(date -u +"%Y%m%d%H%M%S")" >> $GITHUB_ENV
+      
+      #- name: Delete Latest Release
+      #  run: |
+      #    cd $GITHUB_WORKSPACE
+      #    latest_tag=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+      #    if [ -n "$latest_tag" ]; then
+      #      echo "Deleting release with tag: $latest_tag"
+      #      gh release delete "$latest_tag" -y
+      #    else
+      #      echo "No previous release found."
+      #    fi
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # apt-get update
+      #    apt-get install -y wget
+      #    mkdir -p -m 755 /etc/apt/keyrings
+      #    out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg
+      #    cat $out | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+      #    chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+      #    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ env.datetime }}
+          tag_name: ${{ env.tag_name }}
+          body: |
+            Automated release
+            Options:
+            - Debug: ${{ inputs.debug }}
+            - Unsafe: ${{ inputs.unsafe }}
+            - SQLite: ${{ inputs.sqlite }}
+            - cURL: ${{ inputs.curl }}
+            - SSL: ${{ inputs.ssl }}
+            - AIRJUMPS: ${{ inputs.airjumps }}
+      
+      - name: Debug Build Output
+        run: ls -l build
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/libcod1.so
+          asset_name: libcod1.so
+          asset_content_type: application/octet-stream
