@@ -99,4 +99,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: iw1x library
-          path: bin/libcod1.so
+          path: bin/iw1x.so
