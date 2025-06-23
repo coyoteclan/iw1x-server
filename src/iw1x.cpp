@@ -1,4 +1,5 @@
 #include "iw1x.h"
+#include "shared.h"
 
 //// Cvars
 cvar_t *com_cl_running;
@@ -2494,6 +2495,15 @@ void hook_ClientCommand(int clientNum)
     // [glitch patch] follow while alive
     if(!strcmp(cmd, "follownext") || !strcmp(cmd, "followprev")) // Not checking if alive, client doesn't call these commands when clicking as spectator
         return;
+
+    if(!strcmp(cmd, "say") || !strcmp(cmd, "say_team"))
+    {
+        if(customPlayerState[clientNum].mute)
+        {
+            Com_DPrintf("Player %s is mute\n", svs.clients[clientNum].name);
+            return;
+        }
+    }
 
     if (!codecallback_playercommand)
     {

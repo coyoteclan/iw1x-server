@@ -748,3 +748,34 @@ void gsc_player_ishiddenfromscoreboard(scr_entref_t ref)
 
     Scr_AddBool(customPlayerState[id].hiddenFromScoreboard);
 }
+
+void gsc_player_mute(scr_entref_t ref)
+{
+    int id = ref.entnum;
+
+    if (id >= MAX_CLIENTS)
+    {
+        stackError("gsc_player_mute() entity %i is not a player", id);
+        Scr_AddUndefined();
+        return;
+    }
+
+    bool mute = Scr_GetInt(0);
+    customPlayerState[id].mute = mute;
+
+    Scr_AddBool(true);
+}
+
+void gsc_player_ismute(scr_entref_t ref)
+{
+    int id = ref.entnum;
+
+    if (id >= MAX_CLIENTS)
+    {
+        stackError("gsc_player_ismute() entity %i is not a player", id);
+        Scr_AddUndefined();
+        return;
+    }
+
+    Scr_AddBool(customPlayerState[id].mute);
+}

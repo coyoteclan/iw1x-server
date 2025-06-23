@@ -1056,6 +1056,7 @@ typedef struct customPlayerState_s
     int sprintTimer;
     bool noAutoPickup;
     bool hiddenFromScoreboard;
+    bool mute;
 } customPlayerState_t;
 
 typedef struct customChallenge_s

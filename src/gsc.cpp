@@ -161,6 +161,8 @@ scr_method_t scriptMethods[] =
     {"dropClient", gsc_player_dropclient, 0},
     {"setHiddenFromScoreboard", gsc_player_sethiddenfromscoreboard, 0},
     {"isHiddenFromScoreboard", gsc_player_ishiddenfromscoreboard, 0},
+    {"mutePlayer", gsc_player_mute, 0},
+    {"isMute", gsc_player_ismute, 0},
 
     {"getVelocity", gsc_player_getvelocity, 0},
     {"setVelocity", gsc_player_setvelocity, 0},
