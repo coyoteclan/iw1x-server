@@ -1,3 +1,8 @@
+# INFO
+Migrated to GitLab:
+https://gitlab.com/kazam0180/iw1x-server
+
+
 ###### top-link
 # Improvements for [CoD1](https://en.wikipedia.org/wiki/Call_of_Duty_(video_game)) Linux server
 ### Adding security, fixes, and features
